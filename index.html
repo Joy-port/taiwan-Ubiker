@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><%- title %></title>
+    <title>bike map</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
@@ -19,7 +19,36 @@
   <body>
 
 
-    <%- contents %>
+    
+<div class="position-relative h-100">
+  <div id="map"></div>
+  <div class="card p-3 position-absolute top-0 start-0" style=" z-index: 1000;">
+     <label for="search" class="h2 form-label mb-3">站牌搜尋</label>
+      <input type="text" class="form-control mb-3 " id="search" placeholder="請輸入站牌關鍵字">
+      <div class="d-flex gap-4 mb-3" >
+          <div class="">
+              <label for="city" class="form-label">縣市</label>
+              <div class="select">
+
+                  <select id="city" class="form-control">
+                      <option value="臺北市">臺北市</option>
+                  </select>
+              </div>
+          </div>
+          <div class="">
+              <label for="city" class="form-label">鄉鎮區</label>
+              <div class="select">
+
+                  <select name="" id="country" class="form-control">
+                      <option value="全部">全部</option>
+                  </select>
+              </div>
+          </div>
+      </div>
+      <a href="#" class="btn btn-success w-100">搜尋</a>
+  </div>
+</div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha.min.js" integrity="sha512-/yIGjYJZIXZx10ig0yhbK41OiwcqBUxIj0xQJe+NwkMIdS/u07b6Mwo0nvXB4o7A6WiKnKOf92JwE5Ezo27u9Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
