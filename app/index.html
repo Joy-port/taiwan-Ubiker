@@ -1,0 +1,35 @@
+---
+title: bike map
+layout: ./app/layout.ejs
+engine: ejs
+current: index
+---
+
+<div class="position-relative h-100">
+  <div id="map"></div>
+  <div class="card p-3 position-absolute top-0 start-0" style=" z-index: 1000;">
+     <label for="search" class="h2 form-label mb-3">站牌搜尋</label>
+      <input type="text" class="form-control mb-3 " id="search" placeholder="請輸入站牌關鍵字">
+      <div class="d-flex gap-4 mb-3" >
+          <div class="">
+              <label for="city" class="form-label">縣市</label>
+              <div class="select">
+
+                  <select id="city" class="form-control">
+                      <option value="臺北市">臺北市</option>
+                  </select>
+              </div>
+          </div>
+          <div class="">
+              <label for="city" class="form-label">鄉鎮區</label>
+              <div class="select">
+
+                  <select name="" id="country" class="form-control">
+                      <option value="全部">全部</option>
+                  </select>
+              </div>
+          </div>
+      </div>
+      <a href="#" class="btn btn-success w-100">搜尋</a>
+  </div>
+</div>
