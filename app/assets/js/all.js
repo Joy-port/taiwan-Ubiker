@@ -1322,41 +1322,6 @@ let bikeShapeData =[
   }
 ];
 
-//stationData
-//   {
-//     "StationUID": "TPE0001",
-//     "StationID": "0001",
-//     "AuthorityID": "TPE",
-//     "StationName": {
-//       "Zh_tw": "YouBike1.0_捷運市政府站(3號出口)",
-//       "En": "YouBike1.0_MRT Taipei City Hall Stataion(Exit 3)-2"
-//     },
-//     "StationPosition": {
-//       "PositionLon": 121.567904444,
-//       "PositionLat": 25.0408578889,
-//       "GeoHash": "wsqqqqe19"
-//     },
-//     "StationAddress": {
-//       "Zh_tw": "忠孝東路/松仁路(東南側)",
-//       "En": "The S.W. side of Road Zhongxiao East Road & Road Chung Yan."
-//     },
-//     "BikesCapacity": 180,
-//     "ServiceType": 1,
-//     "SrcUpdateTime": "2021-11-18T13:04:31+08:00",
-//     "UpdateTime": "2021-11-18T13:05:29+08:00"
-//   },
-//availibleData
-//   {
-//     "StationUID": "TPE0001",
-//     "StationID": "0001",
-//     "ServiceStatus": 1,
-//     "ServiceType": 1,
-//     "AvailableRentBikes": 1,
-//     "AvailableReturnBikes": 176,
-//     "SrcUpdateTime": "2021-11-18T13:03:31+08:00",
-//     "UpdateTime": "2021-11-18T13:04:29+08:00"
-//   },
-
 //透過shape 得到nearby資料
 let stationData = [];
 let availibleData =[];
@@ -1364,6 +1329,8 @@ let filterData = [];
 let longitude = null;
 let latitude = null;
 let centerPosition = [longitude, latitude];
+
+const stationList = document.querySelector('.js-station-list');
 
 let map = L.map('map').setView([25.0408578889,121.567904444], 13);
 // var map = L.map('map', {
@@ -1380,8 +1347,9 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
   accessToken: 'pk.eyJ1IjoiamQ5OTk4NSIsImEiOiJja3c0aWozamdheXIzMm5xcGk3bXQ1NHh0In0.gHWgqH8a5-e31M3zhV0i_w'
 }).addTo(map);
 
+
 var darkGreenIcon = new L.Icon({
-iconUrl: '/icon-green.svg',
+iconUrl: '../../assets/images/icon-green.svg',
 iconSize: [35, 35],
 iconAnchor: [12, 41],
 popupAnchor: [1, -34],
@@ -1389,7 +1357,7 @@ shadowSize: [41, 41]
 });
 
 var lightGreenIcon = new L.Icon({
-  iconUrl: '/icon-green.svg',
+  iconUrl: '../../assets/images/icon-green.svg',
   iconSize: [35, 35],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -1397,7 +1365,7 @@ var lightGreenIcon = new L.Icon({
 });
 
 var redIcon = new L.Icon({
-  iconUrl: '/icon-red.svg',
+  iconUrl: '../../assets/images/icon-red.svg',
   iconSize: [35, 35],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -1405,7 +1373,7 @@ var redIcon = new L.Icon({
 });
 
 var grayIcon = new L.Icon({
-  iconUrl: '/icon-gray.svg',
+  iconUrl: '../../assets/images/icon-gray.svg',
   iconSize: [35, 35],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -1487,8 +1455,8 @@ function getAvailableData(longitude, latitude){
   //     availibleData.forEach(availableItem =>{
   //         stationData.forEach(stationItem =>{
   //             if(availableItem.StationUID === stationItem.StationUID){
-  //                 stationItem.stationTitle = stationItem.StationName.Zh_tw.replace(/_|ˍ/g, '').replace(/YouBike1.0 |YouBike2.0 |iBike1.0 /g, '');
-  //                 stationItem.bikeType = stationItem.ServiceType === 1 ? 'YouBike1.0' : 'YouBike2.0';
+  //                 stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
+  //                 stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
   //                 stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
   //                 stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
   //                 stationItem.UpdateTime = availableItem.UpdateTime;
@@ -1499,6 +1467,7 @@ function getAvailableData(longitude, latitude){
   //     });
 
   //     drawBikeStationOnMap(filterData);
+  //     showBikeStationList(filterData);
   // });
 }
 
@@ -1579,7 +1548,7 @@ function init(){
       });
       console.log(filterData);
   drawBikeStationOnMap(filterData);
-  
+  showBikeStationList(filterData);
   
 }
 
@@ -1588,47 +1557,86 @@ init();
 //click 到popUp的地方時，改變位置
 function getClickPosition(e){
 
- const lat = String(e.latlng.lat);
+const lat = String(e.latlng.lat);
 const lng = String(e.latlng.lng);
   map.panTo([lat,lng], 16);
 
 }
 
 
+
+
 //站牌搜尋功能
 
 
-// axios({
-//     method:'get',
-//     url:'https://ptx.transportdata.tw/MOTC/v2/Bike/Station/Tainan?$top=30&$format=JSON',
-//     header: GetAuthorizationHeader()
-// })
-//     .then(function(res){
+
+//列出常用站牌
+function showBikeStationList(data){
+  let str ='';
+
+  data.forEach(item =>{
+    let content = `
+    <li class="py-2 px-3 bg-light mb-2" data-id="${item.StationUID}">
+    <a href="#" class="d-flex justify-content-between align-items-center gap-3">
+        <p class="mb-0">${item.StationTitle}</p>
+        <div class="d-flex gap-2">
+            <p href="#" class="btn mb-0 ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">${item.AvailableRentBikes}</p>
+            <p href="#" class="btn mb-0 ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">${item.AvailableReturnBikes}</p>
+        </div>
+    </a>
+</li>
+`;
+    str += content;
+  });
+
+  stationList.innerHTML = str;
+}
+
+//點擊常用站牌自動跑到 地圖區
+stationList.addEventListener('click', showStationOnMap);
+
+function showStationOnMap(e){
+  e.preventDefault();
+  // console.log(e.target.closest('li').dataset.id);
+  let lon ='';
+  let lat='';
+  let markColor ='';
+  let id = e.target.closest('li').dataset.id
+  filterData.forEach(item =>{
+    if(item.StationUID === id){
+      lon = item.StationPosition.PositionLon;
+      lat = item.StationPosition.PositionLat;
+
+      if(parseInt(item.AvailableRentBikes)> 5){
+        markColor = darkGreenIcon;
+    }else if(parseInt(item.AvailableRentBikes)<= 5 &&  parseInt(item.AvailableRentBikes)> 0){
+        markColor = lightGreenIcon;
+    }else{
+        markColor = redIcon;
+    };
+    L.marker([lat,lon], {icon: markColor})
+    .bindPopup(`
+        <h1>${item.StationTitle}</h1>
+        <p>${item.StationAddress.Zh_tw}</p>
+        <p>${item.UpdateTime}</p>
+        <div>
+            <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
+                <p>可借車輛 <span class="h1">${item.AvailableRentBikes}</span></p>
+            </a>
+            <a href="#" className="btn ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary':parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)>0 ? 'btn-secondary' :'btn-danger'}" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary':parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)>0 ? 'btn-secondary' :'btn-danger'}">
+                <p>可借車輛 <span class="h1">${item.AvailableReturnBikes}</span></p>
+            </a>
+        </div>`)
+   .addTo(map).openPopup()
+   .on('click',getClickPosition);
+  };
+    
+  });
+
+  map.panTo([lat,lon], 12);
+  map.setView([lat,lon], 16);
   
-//     data = res.data;
-
-//   var markers = new L.MarkerClusterGroup().addTo(map);
-
-//   for(let i =0;data.length>i;i++){
-// //   console.log(data[i].StationPosition.PositionLat);
-//   markers.addLayer(L.marker([data[i].StationPosition.PositionLat,data[i].StationPosition.PositionLon], {icon: greenIcon})
-//     .bindPopup(`<div className="card">
-//     <h1>${data[i].StationName.Zh_tw}</h1>
-//     <p>${data[i].StationAddress.Zh_tw}</p>
-//     <small>${data[i].UpdateTime}</small>
-//     <div className="d-flex">
-//         <a href="#" className="btn btn-success">
-//             <p class="">可借車輛 <span class="h1">${data[i].BikesCapacity}</span></p>
-//         </a>
-//         <a href="#" className="btn btn-warning">
-//             <p class="">可借車輛 <span class="h1">${data[i].BikesCapacity}</span></p>
-//         </a>
-//     </div>
-//     </div>`));
-// }
-//     map.addLayer(markers);
-// });
-
+}
 
 
 function GetAuthorizationHeader() {
