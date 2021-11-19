@@ -1510,13 +1510,13 @@ function getClickPosition(e) {
   var lat = String(e.latlng.lat);
   var lng = String(e.latlng.lng);
   map.panTo([lat, lng], 16);
-} //列出常用站牌
+} //列出站牌清單
 
 
 function showBikeStationList(data) {
   var str = '';
   data.forEach(function (item) {
-    var content = "\n    <li class=\"card p-3 bg-light mb-2 position-relative\" data-id=\"".concat(item.StationUID, "\">\n    <p class=\"h3 border-bottom pb-2 mb-0 mb-3\">").concat(item.StationTitle, "</p>\n      <p class=\"text-secondary mb-0\">").concat(item.StationAddress.Zh_tw, " </p>\n      <p class=\"text-secondary\">").concat(item.BikeType, "</p>\n    <a href=\"#\" class=\"d-flex justify-content-between align-items-center gap-3 stretched-link\">\n        <div class=\"d-flex gap-2\">\n            <p class=\"btn mb-0 ").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-outline-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-outline-secondary' : 'btn-outline-danger', "\">\u53EF\u79DF\u501F <span class=\"fs-3 fw-bold\">").concat(item.AvailableRentBikes, "</span> \u8F1B</p>\n            <p class=\"btn mb-0 ").concat(parseInt(item.AvailableReturnBikes) > 5 ? 'btn-outline-primary' : parseInt(item.AvailableReturnBikes) <= 5 && parseInt(item.AvailableReturnBikes) > 0 ? 'btn-outline-secondary' : 'btn-outline-danger', "\">\u53EF\u6B78\u9084 <span class=\"fs-3 fw-bold\">").concat(item.AvailableReturnBikes, "</span> \u8F1B</p>\n        </div>\n    </a>\n</li>\n");
+    var content = "\n    <li class=\"card p-3 bg-light mb-2 position-relative\" data-id=\"".concat(item.StationUID, "\">\n    <p class=\"h3 border-bottom pb-2 mb-0 mb-3\">").concat(item.StationTitle, "</p>\n      <p class=\"text-secondary mb-0\">").concat(item.StationAddress.Zh_tw, " </p>\n      <p class=\"text-secondary\">").concat(item.BikeType, "</p>\n    <a href=\"#\" class=\"d-flex justify-content-between align-items-center gap-3 stretched-link\">\n        <div class=\"d-flex flex-column flex-md-row gap-2\">\n            <p class=\"btn mb-0 ").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-outline-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-outline-secondary' : 'btn-outline-danger', "\">\u53EF\u79DF\u501F <span class=\"fs-3 fw-bold\">").concat(item.AvailableRentBikes, "</span> \u8F1B</p>\n            <p class=\"btn mb-0 ").concat(parseInt(item.AvailableReturnBikes) > 5 ? 'btn-outline-primary' : parseInt(item.AvailableReturnBikes) <= 5 && parseInt(item.AvailableReturnBikes) > 0 ? 'btn-outline-secondary' : 'btn-outline-danger', "\">\u53EF\u6B78\u9084 <span class=\"fs-3 fw-bold\">").concat(item.AvailableReturnBikes, "</span> \u8F1B</p>\n        </div>\n    </a>\n</li>\n");
     str += content;
   });
   stationList.innerHTML = str;
@@ -1555,7 +1555,7 @@ function showStationOnMap(e) {
   });
   map.panTo([lat, lon], 12);
   map.setView([lat, lon], 16);
-} //列出內容
+} //列出城市select內容
 
 
 function renderOptionList() {
