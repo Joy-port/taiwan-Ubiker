@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>最新消息 | 台灣自行車資訊網</title>
+    <link rel="icon" href="./assets/images/logo-icon/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+    rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css"></link> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css"></link> 
+    <link rel="stylesheet" href="./assets/style/all.css">
+  </head>
+
+  <body>
+      <nav class="navbar navbar-expand-md navbar-light bg-white navber-light-shadow" style="z-index:500;">
+        <div class="container-fluid align-items-center">
+          <h1 class="logo">
+            <a class="navbar-brand" href="#">
+              <img class="align-middle" src="./assets/images/logo.png" alt="logo img">
+            </a>
+          </h1>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link nav-link-hover active" aria-current="page" href="news.html">最新消息</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link nav-link-hover " href="index.html">自行車路線 / 單車租借</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link nav-link-hover" href="#">騎乘小叮嚀</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link nav-link-hover nav-link-warning" href="#">登入</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    
+<div class="bg-img d-flex justify-content-center align-items-center flex-column vh-100 px-5" style="background-image: url(./assets/images/banner.png);">
+    <h2 class="h1 text-white mb-10">台灣自行車資訊網</h2>
+    <div class="position-relative w-100 w-md-50 mb-12">
+        <input type="text" class="form-control" placeholder="請輸入關鍵字">
+        <span class="position-absolute top-50 end-0 translate-middle-y material-icons-outlined me-2">search</span>
+    </div>
+    <div class="d-flex flex-wrap flex-column flex-md-row justify-content-evenly w-md-50 gap-10 ">
+        <a href="index.html" class="btn btn-primary h2 d-flex align-items-center justify-content-center gap-5 shadow w-100 w-md-40">
+            <span class="material-icons-outlined h1">
+                timeline
+            </span>
+            <p class="h3 text-nowrap">自行車路線</p>
+        </a>
+        <a href="index.html" class="btn btn-warning h2 d-flex align-items-center justify-content-center gap-5 link-white shadow w-100 w-md-40 ">
+            <span class="material-icons-outlined h1">
+                directions_bike
+            </span>
+            <p class="h3 text-nowrap">單車租借</p>
+        </a>
+    </div>
+</div>
+
+<div class="container pt-17 pb-15">
+    
+
+    <h2 class="h1 text-gray-3 mb-15 text-center">最新公告</h2>
+    <ul class="mb-12">
+        <li class="">
+            <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+            <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+                <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+                    <p>緊急通知</p>
+                    <p>2021 / 11 / 05</p>
+                </div>
+                <p class="text-gray-3">2021/11/17 (三) 09:00 - 11:00 台北市 南港區 YouBike 1.0『凌雲市場』停電通知</p>
+            </div>
+            <span class="material-icons-outlined">
+                arrow_forward_ios
+            </span>
+        </a>
+    </li>
+    <li class="">
+        <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+        <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+            <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+                <p>緊急通知</p>
+                <p>2021 / 11 / 05</p>
+            </div>
+            <p class="text-gray-3">2021/11/17 (三) 09:00 - 11:00 台北市 南港區 YouBike 1.0『凌雲市場』停電通知</p>
+        </div>
+        <span class="material-icons-outlined">
+            arrow_forward_ios
+        </span>
+    </a>
+</li>
+<li class="">
+    <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+    <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+        <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+            <p>緊急通知</p>
+            <p>2021 / 11 / 05</p>
+        </div>
+        <p class="text-gray-3">2021/11/17 (三) 09:00 - 11:00 台北市 南港區 YouBike 1.0『凌雲市場』停電通知</p>
+    </div>
+    <span class="material-icons-outlined">
+        arrow_forward_ios
+    </span>
+</a>
+</li>
+<li class="">
+    <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+    <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+        <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+            <p>緊急通知</p>
+            <p>2021 / 11 / 05</p>
+        </div>
+        <p class="text-gray-3">2021/11/17 (三) 09:00 - 11:00 台北市 南港區 YouBike 1.0『凌雲市場』停電通知</p>
+    </div>
+    <span class="material-icons-outlined">
+        arrow_forward_ios
+    </span>
+</a>
+</li>
+<li class="">
+    <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+    <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+        <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+            <p>緊急通知</p>
+            <p>2021 / 11 / 05</p>
+        </div>
+        <p class="text-gray-3">2021/11/17 (三) 09:00 - 11:00 台北市 南港區 YouBike 1.0『凌雲市場』停電通知</p>
+    </div>
+    <span class="material-icons-outlined">
+        arrow_forward_ios
+    </span>
+</a>
+</li>
+    </ul>
+    <a href="#" class="btn btn-primary d-block w-30 mx-auto mb-20">更多最新公告</a>
+    <h2 class="h1 text-gray-3 mt-5 mb-15 text-center">近期活動</h2>
+    <ul class="mb-12">
+        <li class="">
+            <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+            <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+                <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+                    <p>台南市</p>
+                    <p>2021 / 11 / 05</p>
+                </div>
+                <p class="text-gray-3">台南YouBike新騎向 越騎越健康 ! 抽Switch主機+健身環 !</p>
+            </div>
+            <span class="material-icons-outlined">
+                arrow_forward_ios
+            </span>
+        </a>
+    </li>
+    <li class="">
+        <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+        <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+            <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+                <p>高雄市</p>
+                <p>2021 / 11 / 05</p>
+            </div>
+            <p class="text-gray-3">高雄YouBike新騎向 越騎越健康 ! 抽Switch主機+健身環 !</p>
+        </div>
+        <span class="material-icons-outlined">
+            arrow_forward_ios
+        </span>
+    </a>
+</li>
+<li class="">
+    <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+    <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+        <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+            <p>彰化縣</p>
+            <p>2021 / 11 / 05</p>
+        </div>
+        <p class="text-gray-3">彰化YouBike新騎向 越騎越健康 ! 抽Switch主機+健身環 !</p>
+    </div>
+    <span class="material-icons-outlined">
+        arrow_forward_ios
+    </span>
+</a>
+</li>
+<li class="">
+    <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+    <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+        <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+            <p>屏東縣</p>
+            <p>2021 / 11 / 05</p>
+        </div>
+        <p class="text-gray-3">屏東YouBike新騎向 越騎越健康 ! 抽Switch主機+健身環 !</p>
+    </div>
+    <span class="material-icons-outlined">
+        arrow_forward_ios
+    </span>
+</a>
+</li>
+<li class="">
+    <a href="#" class="d-flex justify-content-between align-items-center border-bottom py-6 px-9 px-md-10 mb-2">
+    <div class="d-flex flex-column gap-3 gap-md-12 flex-md-row align-items-center">
+        <div class="d-flex justify-content-start w-100 w-md-auto gap-12 text-gray-2">
+            <p>新北市</p>
+            <p>2021 / 11 / 05</p>
+        </div>
+        <p class="text-gray-3">新北YouBike新騎向 越騎越健康 ! 抽Switch主機+健身環 !</p>
+    </div>
+    <span class="material-icons-outlined">
+        arrow_forward_ios
+    </span>
+</a>
+</li>
+    </ul>
+    <a href="#" class="btn btn-primary d-block w-30 mx-auto">更多活動資訊</a>
+
+
+</div>
+
+      <footer class="bg-success py-12">
+        <div class="container text-center">
+            <small class="ms-3 link-dark">©2021 Designed by Yun &nbsp; | &nbsp;Developed by Joy Cheng &nbsp; All Rights Reserved </small>
+        </div>
+
+      </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha.min.js" integrity="sha512-/yIGjYJZIXZx10ig0yhbK41OiwcqBUxIj0xQJe+NwkMIdS/u07b6Mwo0nvXB4o7A6WiKnKOf92JwE5Ezo27u9Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+    <script src="./assets/js/vendors.js"></script>
+    <script src="./assets/js/all.js"></script>
+  </body>
+
+</html>
