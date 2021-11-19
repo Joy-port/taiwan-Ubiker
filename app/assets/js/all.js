@@ -1648,7 +1648,7 @@ const lng = String(e.latlng.lng);
 
 }
 
-//列出常用站牌
+//列出站牌清單
 function showBikeStationList(data){
   let str ='';
 
@@ -1659,7 +1659,7 @@ function showBikeStationList(data){
       <p class="text-secondary mb-0">${item.StationAddress.Zh_tw} </p>
       <p class="text-secondary">${item.BikeType}</p>
     <a href="#" class="d-flex justify-content-between align-items-center gap-3 stretched-link">
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-column flex-md-row gap-2">
             <p class="btn mb-0 ${parseInt(item.AvailableRentBikes)>5 ?'btn-outline-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-outline-secondary' :'btn-outline-danger'}">可租借 <span class="fs-3 fw-bold">${item.AvailableRentBikes}</span> 輛</p>
             <p class="btn mb-0 ${parseInt(item.AvailableReturnBikes)>5 ?'btn-outline-primary': parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)> 0 ? 'btn-outline-secondary' :'btn-outline-danger'}">可歸還 <span class="fs-3 fw-bold">${item.AvailableReturnBikes}</span> 輛</p>
         </div>
@@ -1722,7 +1722,7 @@ function showStationOnMap(e){
   
 }
 
-//列出內容
+//列出城市select內容
 function renderOptionList(){
   let str = '';
   totalCityData.forEach(item=>{
