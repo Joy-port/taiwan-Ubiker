@@ -1,0 +1,115 @@
+.leaflet-popup-content-wrapper {
+  box-shadow: 0px 2px 30px 0px #0000004d;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.leaflet-touch .leaflet-bar a {
+  border-radius: 2px;
+  color: #000;
+  &:hover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #707070;
+  }
+}
+
+.leaflet-popup-content {
+  margin: 0;
+
+  & > h1 {
+    //styleName: 標題三;
+    font-family: Noto Sans, sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    background-color: #212121;
+    color: #fff;
+    text-align: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+  }
+  & > div > p {
+    margin: 0;
+
+    &.text-success {
+      color: #0d706d;
+    }
+    &.text-danger {
+      color: #eb5757;
+    }
+    &.text-warning {
+      color: #f8b714;
+    }
+  }
+  & > div > p:first-child {
+    font-size: 20px;
+    background-color: rgba(101, 101, 101, 0.15);
+    color: #0d706d;
+    border-radius: 10px;
+    padding: 0.55rem 0.75rem;
+  }
+  & > div > p:last-child {
+    font-size: 18px;
+    color: rgb(2, 11, 66);
+  }
+  & > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.25rem 1rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.leaflet-container {
+  & a {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0.65rem 1rem;
+    font-family: Noto Sans, sans-serif;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+
+    width: 45%;
+    & > p:last-child {
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+    }
+    & > p {
+      font-size: 18px;
+      font-weight: 400;
+      margin: 0;
+    }
+    &#btn-secondary {
+      background-color: #129995;
+    }
+    &#btn-primary {
+      background-color: #0d706d;
+    }
+    &#btn-danger {
+      background-color: #eb5757;
+    }
+  }
+}
+
+.leaflet-container a .btn-secondary {
+  background-color: #129995;
+}
+.leaflet-container a .btn-primary {
+  background-color: #129995;
+}
+.leaflet-container a .btn-danger {
+  background-color: #129995;
+}

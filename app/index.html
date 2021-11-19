@@ -1,48 +1,79 @@
 ---
-title: bike map
+title: 自行車地圖 | 台灣自行車資訊網
 layout: ./app/layout.ejs
 engine: ejs
 current: index
 ---
-<div class="position-relative" style="height: calc(100vh - 84px);">
-  <div id="map"></div>
-<div class="position-absolute top-0 start-0 h-100 px-5 py-3 ms-2" style="width: 35%; z-index: 800;">
-    <div class="card card-shadow p-3" >
-        <h1 for="search" class="text-center h3 form-label mb-3">搜尋城市</h1>
-    <div class="d-flex flex-wrap flex-md-row gap-3 justify-content-center align-items-center pb-3 border-bottom mb-2">
-                <div class="select">
-                    <select id="city" class="form-control js-city-list">
-                        <option value="臺北市">臺北市</option>
-                    </select>
+
+<div class="position-relative" style="height: calc(100vh - 84px)">
+  <div class="h-100 w-100" id="map"></div>
+  <div
+    class="position-absolute top-0 start-0 h-100 px-5 py-3 ms-2"
+    style="width: 37%; z-index: 800"
+  >
+    <div class="card card-shadow pt-4 p-3">
+      <ul class="d-flex justify-content-around mb-3 js-map-tabs">
+        <li class="h3 text-center card-border-bottom-hover-primary-2 pb-2 w-50" data-tab ="route">
+              自行車路線
+        </li>
+        <li class="h3 text-center active card-border-bottom-hover-primary-2 pb-2 w-50" data-tab ="rent">
+              單車租借
+        </li>
+      </ul>
+      <div class="js-render-btn">
+        <div class="select mb-3">
+          <select id="city" class="form-control js-city-list">
+            <option value="臺北市">臺北市</option>
+          </select>
+        </div>
+          <a
+            href="#"
+            class="
+              btn btn-primary
+              d-flex
+              align-items-center
+              justify-content-center
+              h-50
+              mb-3
+              js-location-btn
+            "
+          >
+            <span class="material-icons me-3"> near_me </span>
+            開啟定位服務
+          </a>
+        </div>
+        <div class="js-render-list">
+
+          <div class="card-body px-0" style="height: calc(100vh - 400px)">
+            <ul
+              class="h-100 overflow-auto js-station-list"
+            >
+            <li class="card border-0 card-list-color p-3 mb-2" data-id="${item.StationUID}">
+              <div class="d-flex justify-content-between align-items-center flex-wrap border-bottom pb-2 mb-3">
+              <p class="h4">${item.StationTitle}</p>
+              <p class="btn rounded-pill py-1 px-2">${item.BikeType}</p>
+              </div>
+                <p class="mb-3">${item.StationAddress.Zh_tw} </p>
+              <div class="d-flex justify-content-between align-items-center gap-3">
+                <p class="btn btn-white w-50">可租借 <span class="fs-3 fw-bold">12/span> 輛</p>
+                <p class="btn btn-white w-50">可歸還 <span class="fs-3 fw-bold">20</span> 輛</p>
+              </div>
+          </li>
+              <li class="card border-0 card-list-color p-3 mb-2" data-id="${item.StationUID}">
+                <div class="d-flex justify-content-between align-items-center flex-wrap border-bottom pb-2 mb-3">
+                <p class="h4">${item.StationTitle}</p>
+                <p class="btn rounded-pill py-1 px-2">${item.BikeType}</p>
                 </div>
-                <a href="#" class="btn btn-success d-flex align-items-center justify-content-center h-50 js-location-btn">
-                    <span class="material-icons">
-                        near_me
-                        </span>
-                        開啟定位服務
-                </a>
-            </div>
-    <div class="card-body px-0" style="height:calc(100vh - 400px)">
-        <ul class="list-unstyled h-100 js-station-list" style="height: auto; overflow: auto;">
-            <li class="py-2 px-3 bg-light mb-2">
-                <a href="#" class="d-flex justify-content-between align-items-center gap-3">
-                    <p class="mb-0">捷運市政府站(3號出口)</p>
-                    <div class="d-flex gap-2">
-                        <p href="#" class="btn btn-success mb-0">12</p>
-                        <p href="#" class="btn btn-danger mb-0">12</p>
-                    </div>
-                </a>
-            </li>
-            <li class="py-2 px-3 bg-light mb-2" data-id="${item.StationUID}">
-                <p class="mb-0">${item.StationTitle}</p>
+                  <p class="mb-3">${item.StationAddress.Zh_tw} </p>
                 <div class="d-flex justify-content-between align-items-center gap-3">
-                    <div class="d-flex gap-2">
-                        <p class="btn mb-0 ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">${item.AvailableRentBikes}</p>
-                        <p class="btn mb-0 ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">${item.AvailableReturnBikes}</p>
-                    </div>
+                  <p class="btn btn-white w-50">可租借 <span class="fs-3 fw-bold">12/span> 輛</p>
+                  <p class="btn btn-white w-50">可歸還 <span class="fs-3 fw-bold">20</span> 輛</p>
                 </div>
             </li>
-        </ul>
+            </ul>
+          </div>
+     
+        </div>
     </div>
-</div>
+  </div>
 </div>

@@ -1,0 +1,25 @@
+select {
+  width: 100px;
+  cursor: pointer;
+  color: #000;
+  padding-right: 10px;
+}
+
+.select {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "\007C\00A0\00A0\00A0\25BC";
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    color: #000;
+    background-color: #fff;
+  }
+}
+
+.form-control {
+  padding: 0.625rem 3rem 0.625rem 1rem;
+}
