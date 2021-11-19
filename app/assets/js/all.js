@@ -1,6 +1,7 @@
 //bbbf44c0e2534c17bbf5553afe5cfb24
 //YLongjG_6wqXgBm5FQ4LIpW7bPQ
 
+//測試用資料
 let bikeCityData =[
   {
     "StationUID": "TPE0001",
@@ -1331,6 +1332,9 @@ let latitude = null;
 let centerPosition = [longitude, latitude];
 
 const stationList = document.querySelector('.js-station-list');
+const searchStationTxt  = document.querySelector('.js-search-txt');
+const searchStationCityList  = document.querySelector('.js-city-list');
+const searchStationCountryList  = document.querySelector('.js-country-list');
 
 let map = L.map('map').setView([25.0408578889,121.567904444], 13);
 // var map = L.map('map', {
@@ -1390,15 +1394,6 @@ const blueIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-//custom popup
-// specify popup options 
-var customOptions =
-  {
-  'maxWidth': '400',
-  'width': '200',
-  'className' : 'popupCustom'
-  }
-
 //取得瀏覽器當下點擊的地理位置 + nearby 的bike 資料 ＋預設情況
 function getCurrentPosition(){
   if (navigator.geolocation) {
@@ -1413,7 +1408,7 @@ function getCurrentPosition(){
       map.setView([latitude,longitude], 15);
 
       // 將經緯度當作參數傳給 getData 執行，得到附近station 資料
-      //getStationData(longitude, latitude);
+      getStationData(longitude, latitude);
     },
     // 錯誤訊息
     function (e) {
@@ -1427,50 +1422,47 @@ function getCurrentPosition(){
 }
 //透過shape Geometry 得到nearby 資訊
 function getStationData(longitude, latitude){
-  //axios 先排除
-  // axios({
-  //     method: 'get',
-  //     url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/NearBy?$top=30&$spatialFilter=nearby(${latitude},${longitude},500)`,
-  //     header: GetAuthorizationHeader()
-  // }).then(function(res){
-  //     stationData = res.data; //
-  //     getAvailableData(longitude, latitude);
-  // });
-
-
-
+  axios({
+      method: 'get',
+      url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/NearBy?$top=30&$spatialFilter=nearby(${latitude},${longitude},1000)&$format=JSON`,
+      header: GetAuthorizationHeader()
+  }).then(function(res){
+      stationData = res.data;
+      console.log(stationData);
+      getAvailableData(longitude, latitude);
+  });
 }
 
 //需要同時整合這兩端的資料
 function getAvailableData(longitude, latitude){
 
   //axios 先排除
-  // axios({
-  //     method: 'get',
-  //     url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/NearBy?$top=30&$spatialFilter=nearby(${latitude},${longitude},500)`,
-  //     header: GetAuthorizationHeader()
-  // }).then(function(res){
-  //     availibleData = res.data; //
+  axios({
+      method: 'get',
+      url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Availability/NearBy?$top=30&$spatialFilter=nearby(${latitude},${longitude},1000)&$format=JSON`,
+      header: GetAuthorizationHeader()
+  }).then(function(res){
+      availibleData = res.data; 
+      console.log(availibleData);
 
-  //     availibleData.forEach(availableItem =>{
-  //         stationData.forEach(stationItem =>{
-  //             if(availableItem.StationUID === stationItem.StationUID){
-  //                 stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
-  //                 stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
-  //                 stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
-  //                 stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
-  //                 stationItem.UpdateTime = availableItem.UpdateTime;
+      availibleData.forEach(availableItem =>{
+          stationData.forEach(stationItem =>{
+              if(availableItem.StationUID === stationItem.StationUID){
+                  stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
+                  stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
+                  stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
+                  stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
+                  stationItem.UpdateTime = availableItem.UpdateTime;
 
-  //                 this.filterData.push(stationItem);
-  //             };
-  //         })
-  //     });
+                  filterData.push(stationItem);
+              };
+          })
+      });
 
-  //     drawBikeStationOnMap(filterData);
-  //     showBikeStationList(filterData);
-  // });
+      drawBikeStationOnMap(filterData);
+      showBikeStationList(filterData);
+  });
 }
-
 //將整合到的資料畫到地圖上
 //可借的區域
 function drawBikeStationOnMap(data){
@@ -1527,33 +1519,6 @@ function drawBikeStationOnMap(data){
 
 }
 
-function init(){
-  longitude =121.0082785 ;  // 經度 預設為台北市
-  latitude = 23.7072015;  // 緯度
-
-  map.setView([23.7072015,121.0082785], 8); //需要轉乘數字不能用字串格式
-
-  bikeAvaData.forEach(avaItem =>{
-      bikeCityData.forEach(cityItem =>{
-          if(avaItem.StationUID == cityItem.StationUID){
-              cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
-              cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
-              cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
-              cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
-              cityItem.UpdateTime = avaItem.UpdateTime;
-
-              filterData.push(cityItem);
-          };
-      });
-      });
-      console.log(filterData);
-  drawBikeStationOnMap(filterData);
-  showBikeStationList(filterData);
-  
-}
-
-init();
-
 //click 到popUp的地方時，改變位置
 function getClickPosition(e){
 
@@ -1562,13 +1527,6 @@ const lng = String(e.latlng.lng);
   map.panTo([lat,lng], 16);
 
 }
-
-
-
-
-//站牌搜尋功能
-
-
 
 //列出常用站牌
 function showBikeStationList(data){
@@ -1639,6 +1597,180 @@ function showStationOnMap(e){
 }
 
 
+//站牌搜尋功能
+
+let totalCityData =[
+  {
+    cityName:{
+      Ch: '臺北市',
+      En: 'Taipei'
+    },
+    cityPosition:{
+      lon:'121.0082785',
+      lat:'23.7072015'
+    }
+  },
+  {
+    cityName:{
+      Ch: '新北市',
+      En: 'NewTaipei'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '桃園市',
+      En: 'Taoyuan'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '新竹市',
+      En: 'Hsinchu'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '苗栗縣',
+      En: 'MiaoliCounty'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  
+  {
+    cityName:{
+      Ch: '臺中市',
+      En: 'Taichung'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '臺南市',
+      En: 'Tainan'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '嘉義市',
+      En: 'Chiayi'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '高雄市',
+      En: 'Kaohsiung'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '屏東縣',
+      En: 'PingtungCounty'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '金門縣',
+      En: 'KinmenCounty'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+];
+
+//列出內容
+function renderOptionList(){
+  let str = '';
+  totalCityData.forEach(item=>{
+    let content = `<option value="${item.cityName.En}">${item.cityName.Ch}</option>`;
+    str += content;
+  })
+  searchStationCityList.innerHTML = str;
+}
+
+//選到的城市要抓axios 資料 
+//條列到常用車站上
+searchStationCityList.addEventListener('change', getCityData);
+
+function getCityData(e){
+  let city = e.target.value;
+  axios({
+    method: 'get',
+    url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/${city}?$top=30&$format=JSON`,
+    header: GetAuthorizationHeader()
+}).then(function(res){
+    stationData = res.data;
+    getAvailableCityData(city);
+});
+}
+
+function getAvailableCityData(city){
+  axios({
+    method: 'get',
+    url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Availability/${city}?$top=30&$format=JSON`,
+    header: GetAuthorizationHeader()
+}).then(function(res){
+    availibleData = res.data; 
+    console.log(availibleData);
+
+    availibleData.forEach(availableItem =>{
+        stationData.forEach(stationItem =>{
+            if(availableItem.StationUID === stationItem.StationUID){
+                stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
+                stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
+                stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
+                stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
+                stationItem.UpdateTime = availableItem.UpdateTime;
+
+                filterData.push(stationItem);
+            };
+        })
+    });
+
+    drawBikeStationOnMap(filterData);
+    showBikeStationList(filterData);
+});
+}
+
+
+
+
+//tdx 資料驗證使用
 function GetAuthorizationHeader() {
   var AppID = 'bbbf44c0e2534c17bbf5553afe5cfb24';
   var AppKey = 'YLongjG_6wqXgBm5FQ4LIpW7bPQ';
@@ -1652,3 +1784,36 @@ function GetAuthorizationHeader() {
 
   return { 'Authorization': Authorization, 'X-Date': GMTString /*,'Accept-Encoding': 'gzip'*/}; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
 }
+
+//減少次數功能測試用
+function init(){
+  longitude = 121.0082785 ;  // 經度 預設為台北市
+  latitude = 23.7072015;  // 緯度
+
+  map.setView([23.7072015,121.0082785], 8); //需要轉乘數字不能用字串格式
+
+  bikeAvaData.forEach(avaItem =>{
+      bikeCityData.forEach(cityItem =>{
+          if(avaItem.StationUID == cityItem.StationUID){
+              cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
+              cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
+              cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
+              cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
+              cityItem.UpdateTime = avaItem.UpdateTime;
+
+              filterData.push(cityItem);
+          };
+      });
+      });
+      console.log(filterData);
+  drawBikeStationOnMap(filterData);
+  showBikeStationList(filterData);
+
+  renderOptionList();
+  
+}
+
+init();
+
+//抓真正資料使用 用訂位資料
+// getCurrentPosition();
