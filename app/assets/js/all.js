@@ -1322,6 +1322,119 @@ let bikeShapeData =[
     "Geometry": "MULTILINESTRING ((121.567357783199 24.9855960967387,121.568259004683 24.9867679288557))"
   }
 ];
+let totalCityData =[
+  {
+    cityName:{
+      Ch: '臺北市',
+      En: 'Taipei'
+    },
+    cityPosition:{
+      lon:'121.0082785',
+      lat:'23.7072015'
+    }
+  },
+  {
+    cityName:{
+      Ch: '新北市',
+      En: 'NewTaipei'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '桃園市',
+      En: 'Taoyuan'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '新竹市',
+      En: 'Hsinchu'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '苗栗縣',
+      En: 'MiaoliCounty'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  
+  {
+    cityName:{
+      Ch: '臺中市',
+      En: 'Taichung'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '臺南市',
+      En: 'Tainan'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '嘉義市',
+      En: 'Chiayi'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '高雄市',
+      En: 'Kaohsiung'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '屏東縣',
+      En: 'PingtungCounty'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+  {
+    cityName:{
+      Ch: '金門縣',
+      En: 'KinmenCounty'
+    },
+    cityPosition:{
+      lon:'',
+      lat:''
+    }
+  },
+];
 
 //透過shape 得到nearby資料
 let stationData = [];
@@ -1385,8 +1498,8 @@ var grayIcon = new L.Icon({
 });
 
 //代表當場位置
-const blueIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+var blueIcon = new L.Icon({
+  iconUrl: '../../assets/images/icon-location.svg',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -1404,7 +1517,7 @@ function getCurrentPosition(){
       longitude = position.coords.longitude;  // 經度
       latitude = position.coords.latitude;  // 緯度
       //地圖上畫出當場位置
-      L.marker([latitude,longitude], {icon: blueIcon}).addTo(map).bindPopup(`<small class="text-danger">當下位置</small>`).openPopup();
+      L.marker([latitude,longitude], {icon: blueIcon}).addTo(map);
 
       // 從當場位置設定 view 的位置
       map.setView([latitude,longitude], 15);
@@ -1609,123 +1722,6 @@ function showStationOnMap(e){
   
 }
 
-
-//站牌搜尋功能
-
-let totalCityData =[
-  {
-    cityName:{
-      Ch: '臺北市',
-      En: 'Taipei'
-    },
-    cityPosition:{
-      lon:'121.0082785',
-      lat:'23.7072015'
-    }
-  },
-  {
-    cityName:{
-      Ch: '新北市',
-      En: 'NewTaipei'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  {
-    cityName:{
-      Ch: '桃園市',
-      En: 'Taoyuan'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  {
-    cityName:{
-      Ch: '新竹市',
-      En: 'Hsinchu'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  {
-    cityName:{
-      Ch: '苗栗縣',
-      En: 'MiaoliCounty'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  
-  {
-    cityName:{
-      Ch: '臺中市',
-      En: 'Taichung'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  {
-    cityName:{
-      Ch: '臺南市',
-      En: 'Tainan'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  {
-    cityName:{
-      Ch: '嘉義市',
-      En: 'Chiayi'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  {
-    cityName:{
-      Ch: '高雄市',
-      En: 'Kaohsiung'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  {
-    cityName:{
-      Ch: '屏東縣',
-      En: 'PingtungCounty'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-  {
-    cityName:{
-      Ch: '金門縣',
-      En: 'KinmenCounty'
-    },
-    cityPosition:{
-      lon:'',
-      lat:''
-    }
-  },
-];
-
 //列出內容
 function renderOptionList(){
   let str = '';
@@ -1825,3 +1821,6 @@ function init(){
 }
 
 init();
+
+
+//清除資料功能
