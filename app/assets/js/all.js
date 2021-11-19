@@ -1332,16 +1332,16 @@ let latitude = null;
 let centerPosition = [longitude, latitude];
 
 const stationList = document.querySelector('.js-station-list');
-const searchStationTxt  = document.querySelector('.js-search-txt');
 const searchStationCityList  = document.querySelector('.js-city-list');
-const searchStationCountryList  = document.querySelector('.js-country-list');
+const locationBtn = document.querySelector('.js-location-btn');
 
-let map = L.map('map').setView([25.0408578889,121.567904444], 13);
-// var map = L.map('map', {
-//     center: [25.0408578889,121.567904444],
-//     zoom: 13
-// });
+//初始畫面
+var map = L.map('map', {
+    center: [25.0408578889,121.567904444],
+    zoom: 13
+});
 
+//leaflet mapbox 地圖
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
   attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
   maxZoom: 18,
@@ -1351,7 +1351,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
   accessToken: 'pk.eyJ1IjoiamQ5OTk4NSIsImEiOiJja3c0aWozamdheXIzMm5xcGk3bXQ1NHh0In0.gHWgqH8a5-e31M3zhV0i_w'
 }).addTo(map);
 
-
+//地圖標示的icon
 var darkGreenIcon = new L.Icon({
 iconUrl: '../../assets/images/icon-green.svg',
 iconSize: [35, 35],
@@ -1393,6 +1393,8 @@ const blueIcon = new L.Icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+
+locationBtn.addEventListener('click', getCurrentPosition);
 
 //取得瀏覽器當下點擊的地理位置 + nearby 的bike 資料 ＋預設情況
 function getCurrentPosition(){
@@ -1450,6 +1452,7 @@ function getAvailableData(longitude, latitude){
               if(availableItem.StationUID === stationItem.StationUID){
                   stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
                   stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
+                  stationItem.Service = stationItem.ServiceType===1? '正常營運':stationItem.ServiceType===2? '暫停營運': '停止營運';
                   stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
                   stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
                   stationItem.UpdateTime = availableItem.UpdateTime;
@@ -1501,14 +1504,18 @@ function drawBikeStationOnMap(data){
       markers.addLayer(L.marker([item.StationPosition.PositionLat,item.StationPosition.PositionLon], {icon: markColor})
        .bindPopup(`
            <h1>${item.StationTitle}</h1>
-           <p>${item.StationAddress.Zh_tw}</p>
-           <p>${item.UpdateTime}</p>
+           <div>
+           <p class="${item.ServiceType === 1 ? 'text-success':stationItem.ServiceType===2? 'text-warning': 'text-danger'}">&bull; ${item.ServiceType === 1 ? '正常營運':stationItem.ServiceType===2? '暫停營運': '停止營運'}</p>
+           <p>${item.BikeType}</p>
+           </div>
            <div>
                <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
-                   <p>可借車輛 <span class="h1">${item.AvailableRentBikes}</span></p>
+                   <p>可租借</p>
+                   <p>${item.AvailableRentBikes}</p>
                </a>
-               <a href="#" className="btn ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary':parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)>0 ? 'btn-secondary' :'btn-danger'}" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary':parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)>0 ? 'btn-secondary' :'btn-danger'}">
-                   <p>可借車輛 <span class="h1">${item.AvailableReturnBikes}</span></p>
+               <a href="#" id="${parseInt(item.AvailableReturnBikes)>5 ?'btn-primary':parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)>0 ? 'btn-secondary' :'btn-danger'}">
+                   <p>可歸還</p>
+                   <p>${item.AvailableReturnBikes}</p>
                </a>
            </div>`))
       .addTo(map)
@@ -1534,12 +1541,14 @@ function showBikeStationList(data){
 
   data.forEach(item =>{
     let content = `
-    <li class="py-2 px-3 bg-light mb-2" data-id="${item.StationUID}">
-    <a href="#" class="d-flex justify-content-between align-items-center gap-3">
-        <p class="mb-0">${item.StationTitle}</p>
+    <li class="card p-3 bg-light mb-2 position-relative" data-id="${item.StationUID}">
+    <p class="h3 border-bottom pb-2 mb-0 mb-3">${item.StationTitle}</p>
+      <p class="text-secondary mb-0">${item.StationAddress.Zh_tw} </p>
+      <p class="text-secondary">${item.BikeType}</p>
+    <a href="#" class="d-flex justify-content-between align-items-center gap-3 stretched-link">
         <div class="d-flex gap-2">
-            <p href="#" class="btn mb-0 ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">${item.AvailableRentBikes}</p>
-            <p href="#" class="btn mb-0 ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">${item.AvailableReturnBikes}</p>
+            <p class="btn mb-0 ${parseInt(item.AvailableRentBikes)>5 ?'btn-outline-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-outline-secondary' :'btn-outline-danger'}">可租借 <span class="fs-3 fw-bold">${item.AvailableRentBikes}</span> 輛</p>
+            <p class="btn mb-0 ${parseInt(item.AvailableReturnBikes)>5 ?'btn-outline-primary': parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)> 0 ? 'btn-outline-secondary' :'btn-outline-danger'}">可歸還 <span class="fs-3 fw-bold">${item.AvailableReturnBikes}</span> 輛</p>
         </div>
     </a>
 </li>
@@ -1574,17 +1583,21 @@ function showStationOnMap(e){
     };
     L.marker([lat,lon], {icon: markColor})
     .bindPopup(`
-        <h1>${item.StationTitle}</h1>
-        <p>${item.StationAddress.Zh_tw}</p>
-        <p>${item.UpdateTime}</p>
-        <div>
-            <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
-                <p>可借車輛 <span class="h1">${item.AvailableRentBikes}</span></p>
-            </a>
-            <a href="#" className="btn ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary':parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)>0 ? 'btn-secondary' :'btn-danger'}" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary':parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)>0 ? 'btn-secondary' :'btn-danger'}">
-                <p>可借車輛 <span class="h1">${item.AvailableReturnBikes}</span></p>
-            </a>
-        </div>`)
+    <h1>${item.StationTitle}</h1>
+    <div>
+    <p class="${item.ServiceType === 1 ? 'text-success':stationItem.ServiceType===2? 'text-warning': 'text-danger'}">&bull; ${item.ServiceType === 1 ? '正常營運':stationItem.ServiceType===2? '暫停營運': '停止營運'}</p>
+    <p>${item.BikeType}</p>
+    </div>
+    <div>
+        <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
+            <p>可租借</p>
+            <p>${item.AvailableRentBikes}</p>
+        </a>
+        <a href="#" className="btn ${parseInt(item.AvailableRentBikes)>5 ?'btn-primary':parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)>0 ? 'btn-secondary' :'btn-danger'}" id="${parseInt(item.AvailableReturnBikes)>5 ?'btn-primary':parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)>0 ? 'btn-secondary' :'btn-danger'}">
+            <p>可歸還</p>
+            <p>${item.AvailableReturnBikes}</p>
+        </a>
+    </div>`)
    .addTo(map).openPopup()
    .on('click',getClickPosition);
   };
@@ -1768,8 +1781,6 @@ function getAvailableCityData(city){
 }
 
 
-
-
 //tdx 資料驗證使用
 function GetAuthorizationHeader() {
   var AppID = 'bbbf44c0e2534c17bbf5553afe5cfb24';
@@ -1814,6 +1825,3 @@ function init(){
 }
 
 init();
-
-//抓真正資料使用 用訂位資料
-// getCurrentPosition();
