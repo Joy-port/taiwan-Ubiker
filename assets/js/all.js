@@ -2,6 +2,7 @@
 
 //bbbf44c0e2534c17bbf5553afe5cfb24
 //YLongjG_6wqXgBm5FQ4LIpW7bPQ
+//測試用資料
 var bikeCityData = [{
   "StationUID": "TPE0001",
   "StationID": "0001",
@@ -1228,41 +1229,7 @@ var bikeShapeData = [{
   "FinishedTime": "1021231",
   "UpdateTime": "2021-11-18T00:00:30+08:00",
   "Geometry": "MULTILINESTRING ((121.567357783199 24.9855960967387,121.568259004683 24.9867679288557))"
-}]; //stationData
-//   {
-//     "StationUID": "TPE0001",
-//     "StationID": "0001",
-//     "AuthorityID": "TPE",
-//     "StationName": {
-//       "Zh_tw": "YouBike1.0_捷運市政府站(3號出口)",
-//       "En": "YouBike1.0_MRT Taipei City Hall Stataion(Exit 3)-2"
-//     },
-//     "StationPosition": {
-//       "PositionLon": 121.567904444,
-//       "PositionLat": 25.0408578889,
-//       "GeoHash": "wsqqqqe19"
-//     },
-//     "StationAddress": {
-//       "Zh_tw": "忠孝東路/松仁路(東南側)",
-//       "En": "The S.W. side of Road Zhongxiao East Road & Road Chung Yan."
-//     },
-//     "BikesCapacity": 180,
-//     "ServiceType": 1,
-//     "SrcUpdateTime": "2021-11-18T13:04:31+08:00",
-//     "UpdateTime": "2021-11-18T13:05:29+08:00"
-//   },
-//availibleData
-//   {
-//     "StationUID": "TPE0001",
-//     "StationID": "0001",
-//     "ServiceStatus": 1,
-//     "ServiceType": 1,
-//     "AvailableRentBikes": 1,
-//     "AvailableReturnBikes": 176,
-//     "SrcUpdateTime": "2021-11-18T13:03:31+08:00",
-//     "UpdateTime": "2021-11-18T13:04:29+08:00"
-//   },
-//透過shape 得到nearby資料
+}]; //透過shape 得到nearby資料
 
 var stationData = [];
 var availibleData = [];
@@ -1270,6 +1237,10 @@ var filterData = [];
 var longitude = null;
 var latitude = null;
 var centerPosition = [longitude, latitude];
+var stationList = document.querySelector('.js-station-list');
+var searchStationTxt = document.querySelector('.js-search-txt');
+var searchStationCityList = document.querySelector('.js-city-list');
+var searchStationCountryList = document.querySelector('.js-country-list');
 var map = L.map('map').setView([25.0408578889, 121.567904444], 13); // var map = L.map('map', {
 //     center: [25.0408578889,121.567904444],
 //     zoom: 13
@@ -1284,28 +1255,28 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
   accessToken: 'pk.eyJ1IjoiamQ5OTk4NSIsImEiOiJja3c0aWozamdheXIzMm5xcGk3bXQ1NHh0In0.gHWgqH8a5-e31M3zhV0i_w'
 }).addTo(map);
 var darkGreenIcon = new L.Icon({
-  iconUrl: '/icon-green.svg',
+  iconUrl: '../../assets/images/icon-green.svg',
   iconSize: [35, 35],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
 var lightGreenIcon = new L.Icon({
-  iconUrl: '/icon-green.svg',
+  iconUrl: '../../assets/images/icon-green.svg',
   iconSize: [35, 35],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
 var redIcon = new L.Icon({
-  iconUrl: '/icon-red.svg',
+  iconUrl: '../../assets/images/icon-red.svg',
   iconSize: [35, 35],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
 var grayIcon = new L.Icon({
-  iconUrl: '/icon-gray.svg',
+  iconUrl: '../../assets/images/icon-gray.svg',
   iconSize: [35, 35],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -1319,14 +1290,7 @@ var blueIcon = new L.Icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
-}); //custom popup
-// specify popup options 
-
-var customOptions = {
-  'maxWidth': '400',
-  'width': '200',
-  'className': 'popupCustom'
-}; //取得瀏覽器當下點擊的地理位置 + nearby 的bike 資料 ＋預設情況
+}); //取得瀏覽器當下點擊的地理位置 + nearby 的bike 資料 ＋預設情況
 
 function getCurrentPosition() {
   if (navigator.geolocation) {
@@ -1341,7 +1305,8 @@ function getCurrentPosition() {
       }).addTo(map).bindPopup("<small class=\"text-danger\">\u7576\u4E0B\u4F4D\u7F6E</small>").openPopup(); // 從當場位置設定 view 的位置
 
       map.setView([latitude, longitude], 15); // 將經緯度當作參數傳給 getData 執行，得到附近station 資料
-      //getStationData(longitude, latitude);
+
+      getStationData(longitude, latitude);
     }, // 錯誤訊息
     function (e) {
       var msg = e.code;
@@ -1353,39 +1318,45 @@ function getCurrentPosition() {
 } //透過shape Geometry 得到nearby 資訊
 
 
-function getStationData(longitude, latitude) {//axios 先排除
-  // axios({
-  //     method: 'get',
-  //     url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/NearBy?$top=30&$spatialFilter=nearby(${latitude},${longitude},500)`,
-  //     header: GetAuthorizationHeader()
-  // }).then(function(res){
-  //     stationData = res.data; //
-  //     getAvailableData(longitude, latitude);
-  // });
+function getStationData(longitude, latitude) {
+  axios({
+    method: 'get',
+    url: "https://ptx.transportdata.tw/MOTC/v2/Bike/Station/NearBy?$top=30&$spatialFilter=nearby(".concat(latitude, ",").concat(longitude, ",1000)&$format=JSON"),
+    header: GetAuthorizationHeader()
+  }).then(function (res) {
+    stationData = res.data;
+    console.log(stationData);
+    getAvailableData(longitude, latitude);
+  });
 } //需要同時整合這兩端的資料
 
 
-function getAvailableData(longitude, latitude) {//axios 先排除
-  // axios({
-  //     method: 'get',
-  //     url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/NearBy?$top=30&$spatialFilter=nearby(${latitude},${longitude},500)`,
-  //     header: GetAuthorizationHeader()
-  // }).then(function(res){
-  //     availibleData = res.data; //
-  //     availibleData.forEach(availableItem =>{
-  //         stationData.forEach(stationItem =>{
-  //             if(availableItem.StationUID === stationItem.StationUID){
-  //                 stationItem.stationTitle = stationItem.StationName.Zh_tw.replace(/_|ˍ/g, '').replace(/YouBike1.0 |YouBike2.0 |iBike1.0 /g, '');
-  //                 stationItem.bikeType = stationItem.ServiceType === 1 ? 'YouBike1.0' : 'YouBike2.0';
-  //                 stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
-  //                 stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
-  //                 stationItem.UpdateTime = availableItem.UpdateTime;
-  //                 this.filterData.push(stationItem);
-  //             };
-  //         })
-  //     });
-  //     drawBikeStationOnMap(filterData);
-  // });
+function getAvailableData(longitude, latitude) {
+  //axios 先排除
+  axios({
+    method: 'get',
+    url: "https://ptx.transportdata.tw/MOTC/v2/Bike/Availability/NearBy?$top=30&$spatialFilter=nearby(".concat(latitude, ",").concat(longitude, ",1000)&$format=JSON"),
+    header: GetAuthorizationHeader()
+  }).then(function (res) {
+    availibleData = res.data;
+    console.log(availibleData);
+    availibleData.forEach(function (availableItem) {
+      stationData.forEach(function (stationItem) {
+        if (availableItem.StationUID === stationItem.StationUID) {
+          stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
+          stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
+          stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
+          stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
+          stationItem.UpdateTime = availableItem.UpdateTime;
+          filterData.push(stationItem);
+        }
+
+        ;
+      });
+    });
+    drawBikeStationOnMap(filterData);
+    showBikeStationList(filterData);
+  });
 } //將整合到的資料畫到地圖上
 //可借的區域
 
@@ -1429,7 +1400,232 @@ function drawBikeStationOnMap(data) {
     }).bindPopup("\n           <h1>".concat(item.StationTitle, "</h1>\n           <p>").concat(item.StationAddress.Zh_tw, "</p>\n           <p>").concat(item.UpdateTime, "</p>\n           <div>\n               <a href=\"#\" id=\"").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-secondary' : 'btn-danger', "\">\n                   <p>\u53EF\u501F\u8ECA\u8F1B <span class=\"h1\">").concat(item.AvailableRentBikes, "</span></p>\n               </a>\n               <a href=\"#\" className=\"btn ").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-secondary' : 'btn-danger', "\" id=\"").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-secondary' : 'btn-danger', "\">\n                   <p>\u53EF\u501F\u8ECA\u8F1B <span class=\"h1\">").concat(item.AvailableReturnBikes, "</span></p>\n               </a>\n           </div>"))).addTo(map).on('click', getClickPosition);
   });
   map.addLayer(markers);
+} //click 到popUp的地方時，改變位置
+
+
+function getClickPosition(e) {
+  var lat = String(e.latlng.lat);
+  var lng = String(e.latlng.lng);
+  map.panTo([lat, lng], 16);
+} //列出常用站牌
+
+
+function showBikeStationList(data) {
+  var str = '';
+  data.forEach(function (item) {
+    var content = "\n    <li class=\"py-2 px-3 bg-light mb-2\" data-id=\"".concat(item.StationUID, "\">\n    <a href=\"#\" class=\"d-flex justify-content-between align-items-center gap-3\">\n        <p class=\"mb-0\">").concat(item.StationTitle, "</p>\n        <div class=\"d-flex gap-2\">\n            <p href=\"#\" class=\"btn mb-0 ").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-secondary' : 'btn-danger', "\">").concat(item.AvailableRentBikes, "</p>\n            <p href=\"#\" class=\"btn mb-0 ").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-secondary' : 'btn-danger', "\">").concat(item.AvailableReturnBikes, "</p>\n        </div>\n    </a>\n</li>\n");
+    str += content;
+  });
+  stationList.innerHTML = str;
+} //點擊常用站牌自動跑到 地圖區
+
+
+stationList.addEventListener('click', showStationOnMap);
+
+function showStationOnMap(e) {
+  e.preventDefault(); // console.log(e.target.closest('li').dataset.id);
+
+  var lon = '';
+  var lat = '';
+  var markColor = '';
+  var id = e.target.closest('li').dataset.id;
+  filterData.forEach(function (item) {
+    if (item.StationUID === id) {
+      lon = item.StationPosition.PositionLon;
+      lat = item.StationPosition.PositionLat;
+
+      if (parseInt(item.AvailableRentBikes) > 5) {
+        markColor = darkGreenIcon;
+      } else if (parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0) {
+        markColor = lightGreenIcon;
+      } else {
+        markColor = redIcon;
+      }
+
+      ;
+      L.marker([lat, lon], {
+        icon: markColor
+      }).bindPopup("\n        <h1>".concat(item.StationTitle, "</h1>\n        <p>").concat(item.StationAddress.Zh_tw, "</p>\n        <p>").concat(item.UpdateTime, "</p>\n        <div>\n            <a href=\"#\" id=\"").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-secondary' : 'btn-danger', "\">\n                <p>\u53EF\u501F\u8ECA\u8F1B <span class=\"h1\">").concat(item.AvailableRentBikes, "</span></p>\n            </a>\n            <a href=\"#\" className=\"btn ").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-secondary' : 'btn-danger', "\" id=\"").concat(parseInt(item.AvailableRentBikes) > 5 ? 'btn-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'btn-secondary' : 'btn-danger', "\">\n                <p>\u53EF\u501F\u8ECA\u8F1B <span class=\"h1\">").concat(item.AvailableReturnBikes, "</span></p>\n            </a>\n        </div>")).addTo(map).openPopup().on('click', getClickPosition);
+    }
+
+    ;
+  });
+  map.panTo([lat, lon], 12);
+  map.setView([lat, lon], 16);
+} //站牌搜尋功能
+
+
+var totalCityData = [{
+  cityName: {
+    Ch: '臺北市',
+    En: 'Taipei'
+  },
+  cityPosition: {
+    lon: '121.0082785',
+    lat: '23.7072015'
+  }
+}, {
+  cityName: {
+    Ch: '新北市',
+    En: 'NewTaipei'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '桃園市',
+    En: 'Taoyuan'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '新竹市',
+    En: 'Hsinchu'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '苗栗縣',
+    En: 'MiaoliCounty'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '臺中市',
+    En: 'Taichung'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '臺南市',
+    En: 'Tainan'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '嘉義市',
+    En: 'Chiayi'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '高雄市',
+    En: 'Kaohsiung'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '屏東縣',
+    En: 'PingtungCounty'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}, {
+  cityName: {
+    Ch: '金門縣',
+    En: 'KinmenCounty'
+  },
+  cityPosition: {
+    lon: '',
+    lat: ''
+  }
+}]; //列出內容
+
+function renderOptionList() {
+  var str = '';
+  totalCityData.forEach(function (item) {
+    var content = "<option value=\"".concat(item.cityName.En, "\">").concat(item.cityName.Ch, "</option>");
+    str += content;
+  });
+  searchStationCityList.innerHTML = str;
+} //選到的城市要抓axios 資料 
+//條列到常用車站上
+
+
+searchStationCityList.addEventListener('change', getCityData);
+
+function getCityData(e) {
+  var city = e.target.value;
+  axios({
+    method: 'get',
+    url: "https://ptx.transportdata.tw/MOTC/v2/Bike/Station/".concat(city, "?$top=30&$format=JSON"),
+    header: GetAuthorizationHeader()
+  }).then(function (res) {
+    stationData = res.data;
+    getAvailableCityData(city);
+  });
 }
+
+function getAvailableCityData(city) {
+  axios({
+    method: 'get',
+    url: "https://ptx.transportdata.tw/MOTC/v2/Bike/Availability/".concat(city, "?$top=30&$format=JSON"),
+    header: GetAuthorizationHeader()
+  }).then(function (res) {
+    availibleData = res.data;
+    console.log(availibleData);
+    availibleData.forEach(function (availableItem) {
+      stationData.forEach(function (stationItem) {
+        if (availableItem.StationUID === stationItem.StationUID) {
+          stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
+          stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
+          stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
+          stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
+          stationItem.UpdateTime = availableItem.UpdateTime;
+          filterData.push(stationItem);
+        }
+
+        ;
+      });
+    });
+    drawBikeStationOnMap(filterData);
+    showBikeStationList(filterData);
+  });
+} //tdx 資料驗證使用
+
+
+function GetAuthorizationHeader() {
+  var AppID = 'bbbf44c0e2534c17bbf5553afe5cfb24';
+  var AppKey = 'YLongjG_6wqXgBm5FQ4LIpW7bPQ';
+  var GMTString = new Date().toGMTString();
+  var ShaObj = new jsSHA('SHA-1', 'TEXT');
+  ShaObj.setHMACKey(AppKey, 'TEXT');
+  ShaObj.update('x-date: ' + GMTString);
+  var HMAC = ShaObj.getHMAC('B64');
+  var Authorization = 'hmac username=\"' + AppID + '\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"' + HMAC + '\"';
+  return {
+    'Authorization': Authorization,
+    'X-Date': GMTString
+    /*,'Accept-Encoding': 'gzip'*/
+
+  }; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
+} //減少次數功能測試用
+
 
 function init() {
   longitude = 121.0082785; // 經度 預設為台北市
@@ -1454,58 +1650,10 @@ function init() {
   });
   console.log(filterData);
   drawBikeStationOnMap(filterData);
+  showBikeStationList(filterData);
+  renderOptionList();
 }
 
-init(); //click 到popUp的地方時，改變位置
-
-function getClickPosition(e) {
-  var lat = String(e.latlng.lat);
-  var lng = String(e.latlng.lng);
-  map.panTo([lat, lng], 16);
-} //站牌搜尋功能
-// axios({
-//     method:'get',
-//     url:'https://ptx.transportdata.tw/MOTC/v2/Bike/Station/Tainan?$top=30&$format=JSON',
-//     header: GetAuthorizationHeader()
-// })
-//     .then(function(res){
-//     data = res.data;
-//   var markers = new L.MarkerClusterGroup().addTo(map);
-//   for(let i =0;data.length>i;i++){
-// //   console.log(data[i].StationPosition.PositionLat);
-//   markers.addLayer(L.marker([data[i].StationPosition.PositionLat,data[i].StationPosition.PositionLon], {icon: greenIcon})
-//     .bindPopup(`<div className="card">
-//     <h1>${data[i].StationName.Zh_tw}</h1>
-//     <p>${data[i].StationAddress.Zh_tw}</p>
-//     <small>${data[i].UpdateTime}</small>
-//     <div className="d-flex">
-//         <a href="#" className="btn btn-success">
-//             <p class="">可借車輛 <span class="h1">${data[i].BikesCapacity}</span></p>
-//         </a>
-//         <a href="#" className="btn btn-warning">
-//             <p class="">可借車輛 <span class="h1">${data[i].BikesCapacity}</span></p>
-//         </a>
-//     </div>
-//     </div>`));
-// }
-//     map.addLayer(markers);
-// });
-
-
-function GetAuthorizationHeader() {
-  var AppID = 'bbbf44c0e2534c17bbf5553afe5cfb24';
-  var AppKey = 'YLongjG_6wqXgBm5FQ4LIpW7bPQ';
-  var GMTString = new Date().toGMTString();
-  var ShaObj = new jsSHA('SHA-1', 'TEXT');
-  ShaObj.setHMACKey(AppKey, 'TEXT');
-  ShaObj.update('x-date: ' + GMTString);
-  var HMAC = ShaObj.getHMAC('B64');
-  var Authorization = 'hmac username=\"' + AppID + '\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"' + HMAC + '\"';
-  return {
-    'Authorization': Authorization,
-    'X-Date': GMTString
-    /*,'Accept-Encoding': 'gzip'*/
-
-  }; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
-}
+init(); //抓真正資料使用 用訂位資料
+// getCurrentPosition();
 //# sourceMappingURL=all.js.map

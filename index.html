@@ -17,38 +17,82 @@
   </head>
 
   <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-lg">
+        <div class="container-fluid align-items-center">
+          <h1 class="logo mb-0">
+            <a class="navbar-brand" href="#">
+              <img class="align-middle" src="./assets/images/logo.png" alt="logo img">
+            </a>
+          </h1>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+            <ul class="navbar-nav fw-bold">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#">最新消息</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">自行車路線</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">單車租借</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">騎乘小叮嚀</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-warning" href="#">登入</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
 
-
-    
-<div class="position-relative h-100">
+    <div class="position-relative" style="height: calc(100vh - 84px);">
   <div id="map"></div>
-  <div class="card p-3 position-absolute top-0 start-0" style=" z-index: 1000;">
-     <label for="search" class="h2 form-label mb-3">站牌搜尋</label>
-      <input type="text" class="form-control mb-3 " id="search" placeholder="請輸入站牌關鍵字">
-      <div class="d-flex gap-4 mb-3" >
-          <div class="">
-              <label for="city" class="form-label">縣市</label>
-              <div class="select">
-
-                  <select id="city" class="form-control">
-                      <option value="臺北市">臺北市</option>
-                  </select>
-              </div>
-          </div>
-          <div class="">
-              <label for="city" class="form-label">鄉鎮區</label>
-              <div class="select">
-
-                  <select name="" id="country" class="form-control">
-                      <option value="全部">全部</option>
-                  </select>
-              </div>
-          </div>
-      </div>
-      <a href="#" class="btn btn-success w-100">搜尋</a>
-  </div>
+<div class="container position-absolute top-0 start-0 h-100 py-3" style="width: 35%; z-index: 1000;">
+    <div class="card p-3 mb-3" >
+       <label for="search" class="h2 form-label mb-3">站牌搜尋</label>
+        <input type="text" class="form-control mb-3 js-search-txt" id="search" placeholder="請輸入站牌關鍵字">
+        <div class="d-flex gap-4 mb-3" >
+            <div class="">
+                <label for="city" class="form-label">縣市</label>
+                <div class="select">
+  
+                    <select id="city" class="form-control js-city-list">
+                        <option value="臺北市">臺北市</option>
+                    </select>
+                </div>
+            </div>
+            <div class="">
+                <label for="city" class="form-label">鄉鎮區</label>
+                <div class="select">
+  
+                    <select name="" id="country" class="form-control js-country-list">
+                        <option value="全部">全部</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <a href="#" class="btn btn-success w-100">搜尋</a>
+    </div>
+    <div class="card card-body" style="height:calc(100vh - 400px)">
+        <h2 class="pb-2 mb-3 border-bottom">常用站牌</h2>
+        <ul class="list-unstyled h-100 js-station-list" style="height: auto; overflow: auto;">
+            <li class="py-2 px-3 bg-light mb-2">
+                <a href="#" class="d-flex justify-content-between align-items-center gap-3">
+                    <p class="mb-0">捷運市政府站(3號出口)</p>
+                    <div class="d-flex gap-2">
+                        <p href="#" class="btn btn-success mb-0">12</p>
+                        <p href="#" class="btn btn-danger mb-0">12</p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>
-
+</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha.min.js" integrity="sha512-/yIGjYJZIXZx10ig0yhbK41OiwcqBUxIj0xQJe+NwkMIdS/u07b6Mwo0nvXB4o7A6WiKnKOf92JwE5Ezo27u9Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
