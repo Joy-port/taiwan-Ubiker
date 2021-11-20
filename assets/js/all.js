@@ -1334,13 +1334,17 @@ var totalCityData = [{
 
 var stationData = [];
 var availibleData = [];
+var routeData = [];
 var filterData = [];
 var longitude = null;
 var latitude = null;
 var centerPosition = [longitude, latitude];
 var tabStatus = 'route';
+var geo = null;
+var routeLayer = null;
 var stationList = document.querySelector('.js-station-list');
-var searchStationCityList = document.querySelector('.js-city-list');
+var routeList = document.querySelector('.js-route-list');
+var searchCityList = document.querySelector('.js-city-list');
 var locationBtn = document.querySelector('.js-location-btn');
 var tabs = document.querySelector('.js-map-tabs');
 var tabsBtnGroup = document.querySelector('.js-render-btn');
@@ -1527,10 +1531,9 @@ function showBikeStationList(data) {
   });
   stationList.innerHTML = str;
 } //點擊清單 地圖popUp自動出現且跑到該站牌
+// stationList.addEventListener('click', showStationOnMap);
+// stationList.addEventListener('click', addActiveColor);
 
-
-stationList.addEventListener('click', showStationOnMap);
-stationList.addEventListener('click', addActiveColor);
 
 function showStationOnMap(e) {
   e.preventDefault(); // console.log(e.target.closest('li').dataset.id);
@@ -1573,18 +1576,18 @@ function addActiveColor(e) {
 } //列出城市select內容
 
 
-function renderOptionList() {
+function renderCityOptionList() {
   var str = '';
   totalCityData.forEach(function (item) {
     var content = "<option value=\"".concat(item.cityName.En, "\">").concat(item.cityName.Ch, "</option>");
     str += content;
   });
-  searchStationCityList.innerHTML = str;
+  searchCityList.innerHTML = str;
 } //選到的城市要抓axios 資料 
 //渲染條列到清單上方
 
 
-searchStationCityList.addEventListener('change', getCityData);
+searchCityList.addEventListener('change', getCityData);
 
 function getCityData(e) {
   var city = e.target.value;
@@ -1677,24 +1680,31 @@ function init() {
 
   map.setView([23.7072015, 121.0082785], 8); //需要轉乘數字不能用字串格式
 
-  bikeAvaData.forEach(function (avaItem) {
-    bikeCityData.forEach(function (cityItem) {
-      if (avaItem.StationUID == cityItem.StationUID) {
-        cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
-        cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
-        cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
-        cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
-        cityItem.UpdateTime = avaItem.UpdateTime;
-        filterData.push(cityItem);
-      }
+  if (tabStatus === 'station') {
+    bikeAvaData.forEach(function (avaItem) {
+      bikeCityData.forEach(function (cityItem) {
+        if (avaItem.StationUID == cityItem.StationUID) {
+          cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
+          cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
+          cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
+          cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
+          cityItem.UpdateTime = avaItem.UpdateTime;
+          filterData.push(cityItem);
+        }
 
-      ;
+        ;
+      });
     });
-  });
-  console.log(filterData);
-  drawBikeStationOnMap(filterData);
-  showBikeStationList(filterData);
-  renderOptionList();
+    console.log(filterData);
+    drawBikeStationOnMap(filterData);
+    showBikeStationList(filterData);
+    renderCityOptionList();
+  } else {
+    renderCityOptionList();
+    showRouteList(bikeShapeData);
+  }
+
+  ;
 }
 
 init(); //清除資料功能
@@ -1713,14 +1723,83 @@ function changeTabs(e) {
 }
 
 function updateTabContent() {
-  if (tabStatus === 'rent') {
-    tabsBtnGroup.innerHTML = " \n    <div class=\"select mb-3\">\n      <select id=\"city\" class=\"form-control js-city-list\">\n        <option value=\"\u81FA\u5317\u5E02\">\u81FA\u5317\u5E02</option>\n      </select>\n    </div>\n    <a\n    href=\"#\"\n    class=\"\n      btn btn-primary\n      d-flex\n      align-items-center\n      justify-content-center\n      h-50\n      mb-3\n      js-location-btn\n    \"\n  >\n    <span class=\"material-icons me-3\"> near_me </span>\n    \u958B\u555F\u5B9A\u4F4D\u670D\u52D9\n  </a>";
-    tabsRenderList.innerHTML = "\n  <div class=\"card-body px-0\" style=\"height: calc(100vh - 400px)\">\n            <ul\n              class=\"h-100 overflow-auto js-station-list\"\n            >\n  <li class=\"card border-0 card-list-color p-4 mb-2\">\n  <p>\u8ACB\u958B\u555F\u5B9A\u4F4D\uFF0C\u6216\u662F\u9078\u64C7\u5730\u5340\u5C0B\u627E\u81EA\u884C\u8ECA\u7AD9\u724C</p>\n</li>\n</ul>\n<div>";
+  if (tabStatus === 'station') {
+    tabsBtnGroup.innerHTML = " \n    <div class=\"select mb-3\">\n      <select id=\"city\" class=\"form-control js-city-list\">\n        <option value=\"\u81FA\u5317\u5E02\">\u81FA\u5317\u5E02</option>\n      </select>\n    </div>\n    <a\n    href=\"#\"\n    class=\"\n      btn btn-primary\n      d-flex\n      align-items-center\n      justify-content-center\n      h-50\n      mb-3\n      js-location-btn\n    \"\n  >\n    <span class=\"material-icons me-3\"> near_me </span>\n    \u958B\u555F\u5B9A\u4F4D\u670D\u52D9\n  </a>\n  <div class=\"d-flex js-rent-or-return-btn\">\n    <h5 class=\"mb-3 w-50\"><a href=\"#\" class=\"btn btn-success rounded-0 w-100\">\u501F\u8ECA</a></h5>\n    <h5 class=\"mb-3 w-50\" > <a href=\"#\" class=\"btn btn-light rounded-0 w-100\">\u9084\u8ECA</a></h5>\n  </div>\n  ";
+    tabsRenderList.innerHTML = "\n  <div class=\"card-body px-0\" style=\"height: calc(100vh - 458px)\">\n            <ul\n              class=\"h-100 overflow-auto js-station-list\"\n            >\n  <li class=\"card border-0 card-list-color p-4 mb-2\">\n  <p>\u8ACB\u958B\u555F\u5B9A\u4F4D\uFF0C\u6216\u662F\u9078\u64C7\u5730\u5340\u5C0B\u627E\u81EA\u884C\u8ECA\u7AD9\u724C</p>\n</li>\n</ul>\n<div>";
   } else if (tabStatus === 'route') {
-    tabsBtnGroup.innerHTML = "\n    <div class=\"d-flex justify-content-between\">\n    <h5 class=\"btn btn-success mb-3\">\u5340\u57DF\u8DEF\u7DDA\u641C\u5C0B</h5>\n    <h5 class=\"btn btn-light mb-3\">\u74B0\u5CF6\u8DEF\u7DDA\u641C\u5C0B</h5>\n    <h5 class=\"btn btn-light mb-3\">\u5730\u5716\u5716\u5C64\u641C\u5C0B</h5>\n    </div>\n    \n    <input type=\"text\" class=\"form-control mb-3\" placeholder=\"\u8ACB\u8F38\u5165\u8DEF\u7DDA\u95DC\u9375\u5B57\" />\n    <div class=\"select mb-3\">\n      <select id=\"city\" class=\"form-control js-city-list\">\n        <option value=\"\u81FA\u5317\u5E02\">\u81FA\u5317\u5E02</option>\n      </select>\n    </div>\n    <a\n    href=\"#\"\n    class=\"\n      btn btn-primary\n      d-flex\n      align-items-center\n      justify-content-center\n      h-50\n      mb-3\n      js-location-btn\n    \"\n  >\n    <span class=\"material-icons me-3\"> search </span>\n    \u641C\u5C0B\n  </a>\n    ";
-    tabsRenderList.innerHTML = "\n    <div class=\"card-body px-0\" style=\"height: calc(100vh - 515px)\">\n    <ul\n      class=\"h-100 overflow-auto js-station-list\"\n    >\n<li class=\"card border-0 card-list-color p-4 mb-2\">\n<p>\u8ACB\u8F38\u5165\u95DC\u9375\u5B57\uFF0C\u6216\u662F\u9078\u64C7\u5730\u5340\u5C0B\u627E\u81EA\u884C\u8ECA\u8DEF\u7DDA</p>\n</li>\n</ul>\n<div>\n    ";
+    tabsBtnGroup.innerHTML = "\n    <ul class=\"d-flex justify-content-between\">\n    <li class=\"h5 btn btn-success w-30 mb-3\">\u5340\u57DF\u8DEF\u7DDA\u641C\u5C0B</li>\n    <li class=\"h5 btn btn-light w-30 mb-3\">\u74B0\u5CF6\u8DEF\u7DDA\u641C\u5C0B</li>\n    <li class=\"h5 btn btn-light w-30 mb-3\">\u5730\u5716\u5716\u5C64\u641C\u5C0B</li>\n    </ul>\n    \n    <input type=\"text\" class=\"form-control mb-3\" placeholder=\"\u8ACB\u8F38\u5165\u8DEF\u7DDA\u95DC\u9375\u5B57\" />\n    <div class=\"select mb-3\">\n      <select id=\"city\" class=\"form-control js-route-list\">\n        <option value=\"\u81FA\u5317\u5E02\">\u81FA\u5317\u5E02</option>\n      </select>\n    </div>\n    <a\n    href=\"#\"\n    class=\"\n      btn btn-primary\n      d-flex\n      align-items-center\n      justify-content-center\n      h-50\n      mb-3\n      js-location-btn\n    \"\n  >\n    <span class=\"material-icons me-3\"> search </span>\n    \u641C\u5C0B\n  </a>\n    ";
+    tabsRenderList.innerHTML = "\n    <div class=\"card-body px-0\" style=\"height: calc(100vh - 515px)\">\n    <ul\n      class=\"h-100 overflow-auto js-route-list\"\n    >\n<li class=\"card border-0 card-list-color p-4 mb-2\">\n<p>\u8ACB\u8F38\u5165\u95DC\u9375\u5B57\uFF0C\u6216\u662F\u9078\u64C7\u5730\u5340\u5C0B\u627E\u81EA\u884C\u8ECA\u8DEF\u7DDA</p>\n</li>\n</ul>\n<div>\n    ";
   }
 
   ;
+} //車道api
+
+
+function getRouteList(city) {
+  axios({
+    method: 'get',
+    url: "https://ptx.transportdata.tw/MOTC/v2/Cycling/Shape/".concat(city, "?$format=JSON"),
+    header: GetAuthorizationHeader()
+  }).then(function (res) {
+    routeData = res.data;
+    showRouteList(routeData);
+  });
+}
+
+function showRouteList(data) {
+  var str = '';
+  data.forEach(function (item) {
+    var content = "\n    <li class=\"card border-0 card-list-color p-3 mb-2\" data-id=\"".concat(item.RouteName, "\">\n    <div class=\"d-flex justify-content-between align-items-center flex-wrap border-bottom pb-2 mb-3\">\n    <p class=\"h4\">").concat(item.RouteName, "</p>\n    <div class=\"position-relative\">\n    <input class=\"\" type=\"checkbox\" name=\"route checkBox\" id=\"checkBox\" />\n    <!-- <span class=\"material-icons align-middle position-absolute top-50 start-50 translate-middle fs-2\">\n    favorite_border\n    </span> -->\n    </div>\n    \n    </div>\n    <div class=\"d-flex justify-content-between align-items-center gap-3\">\n      <div class=\"d-flex flex-column justify-content-between gap-3\">\n      <div class=\"d-flex gap-5 h-100\">\n      <span class=\"material-icons-outlined\">\n      directions_bike\n      </span>\n      <p class=\"\">").concat(item.RoadSectionStart, "</p>\n      </div>\n      <div class=\"d-flex gap-5\">\n      <span class=\"material-icons\">\n        flag\n        </span>\n        <p class=\"\">").concat(item.RoadSectionEnd, "</p>\n        </div>\n      </div>\n      <p class=\"btn btn-white rounded-pill w-30\">\u8ECA\u9053\u9577\u5EA6 </br> <span class=\"fs-3 fw-bold\">").concat(item.CyclingLength, "</span> km</p>\n    </div>\n</li>\n");
+    str += content;
+  });
+  routeList.innerHTML = str;
+}
+
+routeList.addEventListener('click', showRouteOnMap);
+
+function showRouteOnMap(e) {
+  if (routeLayer) {
+    map.removeLayer(routeLayer);
+  } //要改為routeData
+
+
+  bikeShapeData.forEach(function (item) {
+    if (item.RouteName === e.target.closest('li').dataset.id) {
+      geo = item.Geometry;
+    }
+
+    ;
+  });
+  polyLine(geo);
+}
+
+function polyLine(item) {
+  // 建立一個 wkt 的實體
+  var wicket = new Wkt.Wkt();
+  var geojsonFeature = wicket.read(item).toJson();
+  var reverseLatlngs = geojsonFeature.coordinates[0];
+  reverseLatlngs.forEach(function (item) {
+    return item.reverse();
+  });
+  var antPath = L.polyline.antPath;
+  routeLayer = antPath(reverseLatlngs, {
+    paused: false,
+    reverse: false,
+    delay: 2000,
+    dashArray: [10, 20],
+    weight: 6,
+    opacity: 0.5
+  });
+  routeLayer.addTo(map); // zoom the map to the layer
+
+  map.fitBounds(routeLayer.getBounds());
+}
+
+function removeMarkers() {
+  map.eachLayer(function (layer) {
+    if (layer instanceof L.Marker) {
+      map.removeLayer(layer);
+    }
+  });
 }
 //# sourceMappingURL=all.js.map
