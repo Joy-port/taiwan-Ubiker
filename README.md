@@ -7,18 +7,19 @@
 
 ## 技術
 Axios
-Leaflet
-MarkerCluster
 jsSHA
+Leaflet
+Marker Cluster
+Leaflet Ant Path
 Wicket
-ESLint
-SCSS
+Bootstrap
 
 ## 功能
 - [x] 臺灣地區下拉功能
 - [x] YouBike 租借站位點
 - [x] 含有 YouBike 地區下拉功能
-- [ ] 自行車道路線圖功能
+- [x] 自行車道路線圖功能
+- [ ] 串連功能統整資料
 - [ ] RWD 版面樣式
 - [ ] 分頁列表功能
 
