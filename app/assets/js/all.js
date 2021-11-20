@@ -2039,20 +2039,28 @@ function polyLine(item){
    const wicket = new Wkt.Wkt();
    const geojsonFeature = wicket.read(item).toJson()
    
-   // 預設樣式
-   // myLayer = L.geoJSON(geojsonFeature).addTo(mymap);
+   const reverseLatlngs = geojsonFeature.coordinates[0];
+   reverseLatlngs.forEach(item => item.reverse());
+   const antPath = L.polyline.antPath;
+  routeLayer = antPath(reverseLatlngs,{
+     paused: false,
+    reverse: false,
+    delay: 2000,
+    dashArray: [10, 20],
+    weight: 6,
+    opacity: 0.5
+   });
  
-   const routeStyle = {
-     "color": "#ff0000",
-     "weight": 5,
-     "opacity": 0.65
-   };
-  routeLayer = L.geoJSON(geojsonFeature, {
-     style: routeStyle
-   }).addTo(map);
- 
-   routeLayer.addData(geojsonFeature);
+  routeLayer.addTo(map);
    // zoom the map to the layer
    map.fitBounds(routeLayer.getBounds());
  
+}
+
+function removeMarkers() {
+  map.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      map.removeLayer(layer)
+    }
+  })
 }
