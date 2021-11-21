@@ -1362,26 +1362,22 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
   accessToken: 'pk.eyJ1IjoiamQ5OTk4NSIsImEiOiJja3c0aWozamdheXIzMm5xcGk3bXQ1NHh0In0.gHWgqH8a5-e31M3zhV0i_w'
 }).addTo(map); //地圖標示的icon
 
-var greenIcon = new L.Icon({
-  iconUrl: require('../../assets/images/icon-green.png'),
-  iconSize: [50, 50],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+var mapIcon = L.Icon.extend({
+  options: {
+    iconSize: [50, 50],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  }
 });
-var redIcon = new L.Icon({
-  iconUrl: require('../../assets/images/icon-red.png'),
-  iconSize: [50, 50],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-var grayIcon = new L.Icon({
-  iconUrl: '../../assets/images/icon-gray.svg',
-  iconSize: [50, 50],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+var greenIcon = new mapIcon({
+  iconUrl: '../../assets/images/icon-green.png'
+}),
+    redIcon = new mapIcon({
+  iconUrl: '../../assets/images/icon-red.png'
+}),
+    grayIcon = new mapIcon({
+  iconUrl: '../../assets/images/icon-gray.png'
 }); //代表當場位置
 
 var blueIcon = new L.Icon({
@@ -1440,7 +1436,13 @@ function updateTabContent() {
   if (tabStatus === 'route') {
     locationBtn.innerHTML = " \n    <span class=\"material-icons me-3\"> search </span>\n      \u641C\u5C0B\n  ";
     tabsRenderList.style.height = 'calc(100vh - 400px)';
-    removeMarkers(); //抓資料用
+    removeMarkers();
+
+    if (filterData.length !== 0) {
+      filterData = [];
+    }
+
+    ; //抓資料用
     // getRouteData();
     //測試用
 
@@ -1449,7 +1451,13 @@ function updateTabContent() {
   } else if (tabStatus === 'station') {
     locationBtn.innerHTML = " \n    <span class=\"material-icons me-3\"> near_me </span>\n    \u958B\u555F\u5B9A\u4F4D\u670D\u52D9\n  ";
     tabsRenderList.style.height = 'calc(100vh - 400px)';
-    removeMarkers(); //抓資料用
+    removeMarkers();
+
+    if (filterData.length !== 0) {
+      filterData = [];
+    }
+
+    ; //抓資料用
     // getStationData();
     //測試用
 
@@ -1472,8 +1480,7 @@ function updateTabContent() {
     console.log(filterData);
     searchCityList.removeEventListener('change', getRouteData);
     contentList.removeEventListener('click', showRouteOnMap);
-    contentList.addEventListener('click', showStationOnMap);
-    contentList.addEventListener('click', showBikeStationList); // searchCityList.addEventListener('change', getStationData); //預設抓台北資料 || select 清單
+    contentList.addEventListener('click', showStationOnMap); // searchCityList.addEventListener('change', getStationData); //預設抓台北資料 || select 清單
     // locationBtn.addEventListener('click', getCurrentPosition); //開啟定位資訊
   }
 
@@ -1511,6 +1518,8 @@ function showRouteList(data) {
 
 
 function showRouteOnMap(e) {
+  console.log(routeLayer);
+
   if (routeLayer) {
     map.removeLayer(routeLayer);
   } //要改為filterData
@@ -1734,13 +1743,12 @@ function getClickPosition(e) {
 } //列出站牌清單
 
 
-function showBikeStationList(data) {
+function showBikeStationList(inputData) {
   var str = '';
-  data.forEach(function (item) {
+  inputData.forEach(function (item) {
     var content = "\n    <li class=\"card border-0 card-list-color p-3 mb-2\" data-id=\"".concat(item.StationUID, "\">\n    <div class=\"d-flex justify-content-between align-items-center flex-wrap border-bottom pb-2 mb-3\">\n    <p class=\"h4\">").concat(item.StationTitle, "</p>\n    <p class=\"badge rounded-pill fs-6 fw-normal py-1 px-2 ").concat(item.BikeType === 'YouBike1.0' ? 'bg-light text-gray-2' : 'bg-success', "\">").concat(item.BikeType, "</p>\n    </div>\n      <p class=\"mb-3\">").concat(item.StationAddress.Zh_tw, " </p>\n    <div class=\"d-flex justify-content-between align-items-center gap-3\">\n      <p class=\"btn btn-white w-50 ").concat(parseInt(item.AvailableRentBikes) > 5 ? 'text-primary' : parseInt(item.AvailableRentBikes) <= 5 && parseInt(item.AvailableRentBikes) > 0 ? 'text-secondary' : 'text-danger', "\">\u53EF\u79DF\u501F </br> <span class=\"fs-3 fw-bold\">").concat(item.AvailableRentBikes, "</span> \u8F1B</p>\n      <p class=\"btn btn-white w-50 ").concat(parseInt(item.AvailableReturnBikes) > 5 ? 'text-primary' : parseInt(item.AvailableReturnBikes) <= 5 && parseInt(item.AvailableReturnBikes) > 0 ? 'text-secondary' : 'text-danger', "\">\u53EF\u6B78\u9084 </br> <span class=\"fs-3 fw-bold\">").concat(item.AvailableReturnBikes, "</span> \u8F1B</p>\n    </div>\n</li>\n");
     str += content;
   });
-  console.log(str);
   contentList.innerHTML = str;
 } //點擊清單 地圖popUp自動出現且跑到該站牌
 // stationList.addEventListener('click', showStationOnMap);
