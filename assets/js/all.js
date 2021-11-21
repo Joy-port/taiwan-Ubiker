@@ -1362,22 +1362,26 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
   accessToken: 'pk.eyJ1IjoiamQ5OTk4NSIsImEiOiJja3c0aWozamdheXIzMm5xcGk3bXQ1NHh0In0.gHWgqH8a5-e31M3zhV0i_w'
 }).addTo(map); //地圖標示的icon
 
-var mapIcon = L.Icon.extend({
-  options: {
-    iconSize: [50, 50],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  }
+var greenIcon = new L.Icon({
+  iconUrl: '../assets/images/icon-green.png',
+  iconSize: [50, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
-var greenIcon = new mapIcon({
-  iconUrl: '../../assets/images/icon-green.png'
-}),
-    redIcon = new mapIcon({
-  iconUrl: '../../assets/images/icon-red.png'
-}),
-    grayIcon = new mapIcon({
-  iconUrl: '../../assets/images/icon-gray.png'
+var redIcon = new L.Icon({
+  iconUrl: '../assets/images/icon-red.png',
+  iconSize: [50, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+var grayIcon = new L.Icon({
+  iconUrl: '../assets/images/icon-gray.png',
+  iconSize: [50, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 }); //代表當場位置
 
 var blueIcon = new L.Icon({
@@ -1447,6 +1451,7 @@ function updateTabContent() {
     //測試用
 
     showRouteList(bikeShapeData);
+    contentList.removeEventListener('click', showStationOnMap);
     contentList.addEventListener('click', showRouteOnMap); // searchCityList.addEventListener('change', getRouteData);
   } else if (tabStatus === 'station') {
     locationBtn.innerHTML = " \n    <span class=\"material-icons me-3\"> near_me </span>\n    \u958B\u555F\u5B9A\u4F4D\u670D\u52D9\n  ";
@@ -1518,8 +1523,6 @@ function showRouteList(data) {
 
 
 function showRouteOnMap(e) {
-  console.log(routeLayer);
-
   if (routeLayer) {
     map.removeLayer(routeLayer);
   } //要改為filterData
