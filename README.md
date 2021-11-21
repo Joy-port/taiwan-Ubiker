@@ -1,6 +1,6 @@
 
 # 自行車道地圖資訊整合網
-[首頁]](https://joy-port.github.io/thef2e-week2/)
+[首頁](https://joy-port.github.io/thef2e-week2/)
 
 ## 介紹
 使用 HTML CSS JavaScript實作自行車道地圖資訊整合網
