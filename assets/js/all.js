@@ -1370,14 +1370,14 @@ var greenIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 var redIcon = new L.Icon({
-  iconUrl: '../assets/images/icon-red.png',
+  iconUrl: 'thef2e-week2/assets/images/icon-red.png',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
 var grayIcon = new L.Icon({
-  iconUrl: '../assets/images/icon-gray.png',
+  iconUrl: 'thef2e-week2/assets/images/icon-gray.png',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
