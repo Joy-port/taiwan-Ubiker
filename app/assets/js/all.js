@@ -1479,32 +1479,20 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 }).addTo(map);
 
 //地圖標示的icon
-var greenIcon = new L.Icon({
-iconUrl: require('../../assets/images/icon-green.png'),
-iconSize: [50, 50],
-iconAnchor: [12, 41],
-popupAnchor: [1, -34],
-shadowSize: [41, 41]
+const mapIcon = L.Icon.extend({
+  options: {
+      iconSize: [50, 50],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+  }
 });
-
-var redIcon = new L.Icon({
-  iconUrl: require('../../assets/images/icon-red.png'),
-  iconSize: [50, 50],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-var grayIcon = new L.Icon({
-  iconUrl: '../../assets/images/icon-gray.svg',
-  iconSize: [50, 50],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+const greenIcon = new mapIcon({iconUrl: '../../assets/images/icon-green.png'}),
+    redIcon = new mapIcon({iconUrl: '../../assets/images/icon-red.png'}),
+    grayIcon = new mapIcon({iconUrl: '../../assets/images/icon-gray.png'});
 
 //代表當場位置
-var blueIcon = new L.Icon({
+const blueIcon = new L.Icon({
   iconUrl: '../../assets/images/icon-location.svg',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [25, 41],
@@ -1566,8 +1554,11 @@ function updateTabContent(){
       搜尋
   `;
   tabsRenderList.style.height = 'calc(100vh - 400px)';
-
-  removeMarkers()
+  removeMarkers();
+  if(filterData.length!==0){
+    filterData = [];
+  };
+  
   //抓資料用
   // getRouteData();
   //測試用
@@ -1583,6 +1574,9 @@ function updateTabContent(){
   `;
   tabsRenderList.style.height = 'calc(100vh - 400px)';
   removeMarkers()
+  if(filterData.length!==0){
+    filterData = [];
+  };
   
   //抓資料用
   // getStationData();
@@ -1608,7 +1602,6 @@ function updateTabContent(){
   contentList.removeEventListener('click', showRouteOnMap);
 
   contentList.addEventListener('click', showStationOnMap);
-  contentList.addEventListener('click', showBikeStationList);
   // searchCityList.addEventListener('change', getStationData); //預設抓台北資料 || select 清單
   // locationBtn.addEventListener('click', getCurrentPosition); //開啟定位資訊
   };
@@ -1673,6 +1666,7 @@ function showRouteList(data){
 
 //用戶點擊路線之後，在地圖上畫路出線圖
 function showRouteOnMap(e){
+  console.log(routeLayer);
   if(routeLayer) {
     map.removeLayer(routeLayer);
   }
@@ -1912,10 +1906,10 @@ let lng = String(e.latlng.lng);
 }
 
 //列出站牌清單
-function showBikeStationList(data){
+function showBikeStationList(inputData){
   let str ='';
 
-  data.forEach(item =>{
+  inputData.forEach(item =>{
     let content = `
     <li class="card border-0 card-list-color p-3 mb-2" data-id="${item.StationUID}">
     <div class="d-flex justify-content-between align-items-center flex-wrap border-bottom pb-2 mb-3">
@@ -1931,7 +1925,6 @@ function showBikeStationList(data){
 `;
     str += content;
   });
-  console.log(str);
   contentList.innerHTML = str;
 }
 
