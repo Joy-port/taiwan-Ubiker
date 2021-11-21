@@ -1,0 +1,22 @@
+.expend-close {
+  // 完全收合
+  transform: translateY(858px);
+}
+.expend-active {
+  // 展開搜尋欄位
+  transform: translateY(670px);
+}
+
+.expend-more {
+  // 完全展開搜尋結果 100%
+  transform: translateY(0px);
+}
+
+.transition-top{
+  transition: top 0.35s ease-in;
+}
+
+.transition-all{
+  transition: all .35s;
+}
+

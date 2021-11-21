@@ -1460,6 +1460,10 @@ const locationBtn = document.querySelector('.js-location-btn');
 // 清單內容
 const contentList = document.querySelector('.js-content-list'); 
 
+//expend btn
+const expendBtn = document.querySelector('.js-expend-btn');
+const expendBox = document.querySelector('.js-expend-box');
+
 
 
 //初始畫面
@@ -1992,6 +1996,22 @@ function showStationOnMap(e){
   
 }
 
+//移除路線
+function removeRouteLayers(){
+  if(routeLayer) {
+    map.removeLayer(routeLayer);
+  };
+}
+
+//移除腳踏車的站點marker
+function removeMarkers(){
+  map.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      map.removeLayer(layer)
+    }
+  })
+}
+
 //切換rent tab
 
 function changeRentTab(e){
@@ -2011,23 +2031,9 @@ function init(){
   updateTabContent();
   
 }
-init();
+// init();
 
-//移除路線
-function removeRouteLayers(){
-  if(routeLayer) {
-    map.removeLayer(routeLayer);
-  };
-}
 
-//移除腳踏車的站點marker
-function removeMarkers(){
-  map.eachLayer((layer) => {
-    if (layer instanceof L.Marker) {
-      map.removeLayer(layer)
-    }
-  })
-}
 
 
 
@@ -2045,4 +2051,24 @@ function GetAuthorizationHeader() {
   var Authorization = 'hmac username=\"' + AppID + '\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"' + HMAC + '\"';
 
   return { 'Authorization': Authorization, 'X-Date': GMTString /*,'Accept-Encoding': 'gzip'*/}; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
+}
+
+
+//expend 按鈕效果
+
+
+expendBtn.addEventListener('click' , changeExpendStatus);
+
+function changeExpendStatus(e){
+const btnContent = document.querySelector('.js-expend-btn span')
+  if(e.target.nodeName ==="SPAN" || e.target.nodeName === "BUTTON"){
+    expendBox.classList.toggle('top-75');
+    expendBox.classList.toggle('top-0');
+
+    if(expendBox.classList.contains('top-0')){
+      btnContent.style.transform = 'rotate(180deg)';
+    }else{
+      btnContent.style.transform = 'rotate(0deg)';
+    };
+  };
 }

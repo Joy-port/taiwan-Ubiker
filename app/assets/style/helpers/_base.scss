@@ -46,3 +46,6 @@ input:focus,
 input:active {
   outline: none;
 }
+button:focus{
+  border: 0;
+}
