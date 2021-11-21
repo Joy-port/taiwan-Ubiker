@@ -1436,27 +1436,30 @@ let totalCityData =[
   },
 ];
 
-//借車停車位js
+let tabStatus = '';
+let rentTab = 'rent';
+let city = 'Taipei';
 
-//透過shape 得到nearby資料
+let routeLayer = null;
+let geo = null;
+
+
 let stationData = [];
 let availibleData =[];
-let routeData = [];
 let filterData = [];
 let longitude = null;
 let latitude = null;
 let centerPosition = [longitude, latitude];
-let tabStatus = 'route';
-let geo = null;
-let routeLayer = null;
 
-const stationList = document.querySelector('.js-station-list');
-const routeList = document.querySelector('.js-route-list');
+
+const tabs = document.querySelector('.js-map-tabs');
+const tabsRenderList = document.querySelector('.js-render-list');
 const searchCityList  = document.querySelector('.js-city-list');
 const locationBtn = document.querySelector('.js-location-btn');
-const tabs = document.querySelector('.js-map-tabs');
-const tabsBtnGroup = document.querySelector('.js-render-btn');
-const tabsRenderList = document.querySelector('.js-render-list');
+
+// 清單內容
+const contentList = document.querySelector('.js-content-list'); 
+
 
 
 //初始畫面
@@ -1518,9 +1521,269 @@ var blueIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-locationBtn.addEventListener('click', getCurrentPosition);
+//全域route & station 切換分頁功能
+//change tab 切換map 地圖功能標籤
+tabs.addEventListener('click', changeTabs);
+
+//切換tab時增加樣式
+function changeTabs(e){
+  tabStatus = e.target.closest('li').dataset.tab;
+  let tabs = document.querySelectorAll('.js-map-tabs li');
+  tabs.forEach(item => {
+    item.classList.remove('active');
+  });
+  e.target.classList.add('active');
+  
+  updateTabContent();
+}
+
+//列出城市select內容
+function renderCityOptionList(){
+  let str = '';
+  totalCityData.forEach(item=>{
+    let content = `<option value="${item.cityName.En}">${item.cityName.Ch}</option>`;
+    str += content;
+  })
+  searchCityList.innerHTML = str;
+}
+
+function getCityName(e){
+  city = e.target.value || 'Taipei';
+}
+
+//將點擊到的清單增加樣式
+contentList.addEventListener('click',addActiveColor);
+
+function addActiveColor(e){
+  let contents = document.querySelectorAll('.js-content-list li');
+  contents.forEach(item => {
+    item.classList.remove('active');
+  });
+  e.target.closest('li').classList.add('active');
+}
+
+//切換分頁渲染出內容
+//綁定監聽
+function updateTabContent(){
+  renderCityOptionList();
+  searchCityList.addEventListener('change',getCityName);
+
+  if(tabStatus=== 'route'){
+    locationBtn.innerHTML =` 
+    <span class="material-icons me-3"> search </span>
+      搜尋
+  `;
+  tabsRenderList.style.height = 'calc(100vh - 400px)';
+
+  //抓資料用
+  // getRouteData();
+  //測試用
+  showRouteList(bikeShapeData);
+  contentList.addEventListener('click', showRouteOnMap);
+  // searchCityList.addEventListener('change', getRouteData);
+
+
+  }else if(tabStatus=== 'station'){
+    locationBtn.innerHTML =` 
+    <span class="material-icons me-3"> near_me </span>
+    開啟定位服務
+  `;
+  tabsRenderList.style.height = 'calc(100vh - 400px)';
+
+  //抓資料用
+  getStationData();
+  //測試用
+  //   bikeAvaData.forEach(avaItem =>{
+  //     bikeCityData.forEach(cityItem =>{
+  //         if(avaItem.StationUID == cityItem.StationUID){
+  //             cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
+  //             cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
+  //             cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
+  //             cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
+  //             cityItem.UpdateTime = avaItem.UpdateTime;
+
+  //             filterData.push(cityItem);
+  //         };
+  //     });
+  //     });
+  //     console.log(filterData);
+  // drawBikeStationOnMap(filterData);
+  // showBikeStationList(filterData);
+  // console.log(filterData);
+
+  searchCityList.removeEventListener('change', getRouteData);
+  contentList.removeEventListener('click', showRouteOnMap);
+  
+  contentList.addEventListener('click', showStationOnMap);
+  contentList.addEventListener('click', showBikeStationList);
+  searchCityList.addEventListener('change', getStationData); //預設抓台北資料 || select 清單
+  locationBtn.addEventListener('click', getCurrentPosition); //開啟定位資訊
+  };
+}
+
+//route
+//預設route 要顯示taipei 路線圖
+//route bike 選擇城市列出城市的route
+function getRouteData(){
+  if(filterData.length !== 0){
+    filterData = [];
+  };
+  axios({
+    method: 'get',
+    url: `https://ptx.transportdata.tw/MOTC/v2/Cycling/Shape/${city}?$format=JSON`,
+    header: GetAuthorizationHeader()
+}).then(function(res){
+    filterData = res.data; 
+    showRouteList(filterData);
+  });
+}
+
+//將route資料列出在清單上
+function showRouteList(data){
+  let str = '';
+  data.forEach(item =>{
+    let content = `
+    <li class="card border-0 card-list-color p-3 mb-2" data-id="${item.RouteName}">
+    <div class="d-flex justify-content-between align-items-center flex-wrap border-bottom pb-2 mb-3">
+    <p class="h4">${item.RouteName}</p>
+    <div class="position-relative">
+    <input class="" type="checkbox" name="route checkBox" id="checkBox" />
+    <!-- <span class="material-icons align-middle position-absolute top-50 start-50 translate-middle fs-2">
+    favorite_border
+    </span> -->
+    </div>
+    
+    </div>
+    <div class="d-flex justify-content-between align-items-center gap-3">
+      <div class="d-flex flex-column justify-content-between gap-3">
+      <div class="d-flex gap-5 h-100">
+      <span class="material-icons-outlined">
+      directions_bike
+      </span>
+      <p class="">${item.RoadSectionStart}</p>
+      </div>
+      <div class="d-flex gap-5">
+      <span class="material-icons">
+        flag
+        </span>
+        <p class="">${item.RoadSectionEnd}</p>
+        </div>
+      </div>
+      <p class="btn btn-white rounded-pill w-30">車道長度 </br> <span class="fs-3 fw-bold">${item.CyclingLength}</span> km</p>
+    </div>
+</li>
+`;
+    str += content;
+  })
+  contentList.innerHTML = str;  
+}
+
+//用戶點擊路線之後，在地圖上畫路出線圖
+function showRouteOnMap(e){
+  if(routeLayer) {
+    map.removeLayer(routeLayer);
+  }
+  //要改為routeData
+  bikeShapeData.forEach(item =>{
+    if(item.RouteName === e.target.closest('li').dataset.id ){
+      geo = item.Geometry;
+    };
+  });
+
+  polyLine(geo);
+}
+//分解路線經緯線內容轉為一條線
+function polyLine(item){
+   // 建立一個 wkt 的實體
+   const wicket = new Wkt.Wkt();
+   const geojsonFeature = wicket.read(item).toJson()
+   
+   const reverseLatlngs = geojsonFeature.coordinates[0];
+   reverseLatlngs.forEach(item => item.reverse());
+   const antPath = L.polyline.antPath;
+  routeLayer = antPath(reverseLatlngs,{
+     paused: false,
+    reverse: false,
+    delay: 2000,
+    dashArray: [10, 20],
+    weight: 6,
+    opacity: 0.5
+   });
+ 
+  routeLayer.addTo(map);
+   // zoom the map to the layer
+   map.fitBounds(routeLayer.getBounds());
+ 
+}
+
+//station tab
+
+function getStationData(){
+  if(filterData.length !== 0){
+    filterData = [];
+    stationData = [];
+    availibleData =[];
+  };
+
+  axios({
+    method: 'get',
+    url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/${city}?$format=JSON`,
+    header: GetAuthorizationHeader()
+}).then(function(res){
+    stationData = res.data;
+    getAvailableCityData(city);
+});
+}
+
+
+
+function getAvailableCityData(city){
+  axios({
+    method: 'get',
+    url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Availability/${city}?$format=JSON`,
+    header: GetAuthorizationHeader()
+}).then(function(res){
+    availibleData = res.data; 
+    
+    availibleData.forEach(availableItem =>{
+        stationData.forEach(stationItem =>{
+            if(availableItem.StationUID === stationItem.StationUID){
+                stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
+                stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
+                stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
+                stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
+                stationItem.UpdateTime = availableItem.UpdateTime;
+
+                filterData.push(stationItem);
+            };
+        })
+    });
+    drawBikeStationOnMap(filterData);
+    showBikeStationList(filterData);
+
+    //跑到點擊的城市範圍
+    getCityPosition(city);
+});
+}
+
+//顯示城市的map view
+function getCityPosition(city){
+let lat = '';
+let lng = '';
+
+  totalCityData.forEach(item => {
+    if(item.cityName.En === city){
+      lat = item.cityPosition.lat;
+      lng = item.cityPosition.lon;
+    };
+  });
+
+  map.panTo([lat,lng], 13);
+  map.setView([lat,lng], 13);
+}
 
 //取得瀏覽器當下點擊的地理位置 + nearby 的bike 資料 ＋預設情況
+// locationBtn.addEventListener('click', getCurrentPosition);
 function getCurrentPosition(){
   if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(
@@ -1536,7 +1799,7 @@ function getCurrentPosition(){
       map.setView([latitude,longitude], 15);
 
       // 將經緯度當作參數傳給 getData 執行，得到附近station 資料
-      getStationData(longitude, latitude);
+      getNearByStationData(longitude, latitude);
     },
     // 錯誤訊息
     function (e) {
@@ -1550,7 +1813,7 @@ function getCurrentPosition(){
 }
 }
 //透過shape Geometry 得到nearby 資訊
-function getStationData(longitude, latitude){
+function getNearByStationData(longitude, latitude){
   axios({
       method: 'get',
       url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/NearBy?$top=30&$spatialFilter=nearby(${latitude},${longitude},1000)&$format=JSON`,
@@ -1590,7 +1853,7 @@ function getAvailableData(longitude, latitude){
   });
 }
 //將整合到的資料畫到地圖上
-//可借的區域
+//暫時以可借的區域劃分 || if rentTab = 'rent' || rentTab = 'return'
 function drawBikeStationOnMap(data){
   let markColor = '';
   //群組化
@@ -1614,36 +1877,68 @@ function drawBikeStationOnMap(data){
         });
       },
     });
-
-  data.forEach(item => {
-    //先用可借的數量來做判斷
-    if(parseInt(item.AvailableRentBikes)> 5){
-        markColor = darkGreenIcon;
-    }else if(parseInt(item.AvailableRentBikes)<= 5 &&  parseInt(item.AvailableRentBikes)> 0){
-        markColor = lightGreenIcon;
-    }else{
-        markColor = redIcon;
-    };
-      markers.addLayer(L.marker([item.StationPosition.PositionLat,item.StationPosition.PositionLon], {icon: markColor})
-       .bindPopup(`
-           <h1>${item.StationTitle}</h1>
-           <div>
-           <p class="${item.ServiceType === 1 ? 'text-primary':stationItem.ServiceType===2? 'text-warning': 'text-danger'}">&bull; ${item.ServiceType === 1 ? '正常營運':stationItem.ServiceType===2? '暫停營運': '停止營運'}</p>
-           <p>${item.BikeType}</p>
-           </div>
-           <div>
-               <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
-                   <p>可租借</p>
-                   <p>${item.AvailableRentBikes} </p>
-               </a>
-               <a href="#" id="${parseInt(item.AvailableReturnBikes)>5 ?'btn-primary':parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)>0 ? 'btn-secondary' :'btn-danger'}">
-                   <p>可歸還</p>
-                   <p>${item.AvailableReturnBikes}</p>
-               </a>
-           </div>`))
-      .addTo(map)
-      .on('click',getClickPosition);
-  });
+  rentTab = 'rent';
+  if(rentTab === 'rent'){
+    data.forEach(item => {
+      //先用可借的數量來做判斷
+      if(parseInt(item.AvailableRentBikes)> 5){
+          markColor = darkGreenIcon;
+      }else if(parseInt(item.AvailableRentBikes)<= 5 &&  parseInt(item.AvailableRentBikes)> 0){
+          markColor = lightGreenIcon;
+      }else{
+          markColor = redIcon;
+      };
+        markers.addLayer(L.marker([item.StationPosition.PositionLat,item.StationPosition.PositionLon], {icon: markColor})
+         .bindPopup(`
+             <h1>${item.StationTitle}</h1>
+             <div>
+             <p class="${item.ServiceType === 1 ? 'text-primary':stationItem.ServiceType===2? 'text-warning': 'text-danger'}">&bull; ${item.ServiceType === 1 ? '正常營運':stationItem.ServiceType===2? '暫停營運': '停止營運'}</p>
+             <p>${item.BikeType}</p>
+             </div>
+             <div>
+                 <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
+                     <p>可租借</p>
+                     <p>${item.AvailableRentBikes} </p>
+                 </a>
+                 <a href="#" id="${parseInt(item.AvailableReturnBikes)>5 ?'btn-primary':parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)>0 ? 'btn-secondary' :'btn-danger'}">
+                     <p>可歸還</p>
+                     <p>${item.AvailableReturnBikes}</p>
+                 </a>
+             </div>`))
+        .addTo(map)
+        .on('click',getClickPosition);
+    });
+  }else if(rentTab === 'return'){
+    data.forEach(item => {
+      //先用可借的數量來做判斷
+      if(parseInt(item.AvailableReturnBikes)> 5){
+          markColor = darkGreenIcon;
+      }else if(parseInt(item.AvailableReturnBikes)<= 5 &&  parseInt(item.AvailableReturnBikes)> 0){
+          markColor = lightGreenIcon;
+      }else{
+          markColor = redIcon;
+      };
+        markers.addLayer(L.marker([item.StationPosition.PositionLat,item.StationPosition.PositionLon], {icon: markColor})
+         .bindPopup(`
+             <h1>${item.StationTitle}</h1>
+             <div>
+             <p class="${item.ServiceType === 1 ? 'text-primary':stationItem.ServiceType===2? 'text-warning': 'text-danger'}">&bull; ${item.ServiceType === 1 ? '正常營運':stationItem.ServiceType===2? '暫停營運': '停止營運'}</p>
+             <p>${item.BikeType}</p>
+             </div>
+             <div>
+                 <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
+                     <p>可租借</p>
+                     <p>${item.AvailableRentBikes} </p>
+                 </a>
+                 <a href="#" id="${parseInt(item.AvailableReturnBikes)>5 ?'btn-primary':parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)>0 ? 'btn-secondary' :'btn-danger'}">
+                     <p>可歸還</p>
+                     <p>${item.AvailableReturnBikes}</p>
+                 </a>
+             </div>`))
+        .addTo(map)
+        .on('click',getClickPosition);
+    });
+  }
 
   map.addLayer(markers);
 }
@@ -1677,12 +1972,11 @@ function showBikeStationList(data){
     str += content;
   });
 
-  stationList.innerHTML = str;
+  contentList.innerHTML = str;
 }
 
 //點擊清單 地圖popUp自動出現且跑到該站牌
 // stationList.addEventListener('click', showStationOnMap);
-// stationList.addEventListener('click', addActiveColor);
 
 function showStationOnMap(e){
   e.preventDefault();
@@ -1730,94 +2024,37 @@ function showStationOnMap(e){
   
 }
 
-function addActiveColor(e){
-  let stations = document.querySelectorAll('.js-station-list li');
-  stations.forEach(item => {
-    item.classList.remove('active');
-  });
-  e.target.closest('li').classList.add('active');
+//切換rent tab
+
+function changeRentTab(e){
+  rentTab = e.target.dataset.rentTab;
 }
 
-//列出城市select內容
-function renderCityOptionList(){
-  let str = '';
-  totalCityData.forEach(item=>{
-    let content = `<option value="${item.cityName.En}">${item.cityName.Ch}</option>`;
-    str += content;
+//減少次數功能測試用
+function init(){
+  //地圖位置預設
+  longitude = 121.0082785 ;  // 經度 預設為台北市
+  latitude = 23.7072015;  // 緯度
+  map.setView([23.7072015,121.0082785], 8); //需要轉乘數字不能用字串格式
+
+  //預設分頁為
+  tabStatus = 'route';
+  // 更新樣式+互動效果
+  updateTabContent();
+  
+}
+init();
+
+//移除腳踏車的站點marker
+function removeMarkers(){
+  map.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      map.removeLayer(layer)
+    }
   })
-  searchCityList.innerHTML = str;
 }
 
-//選到的城市要抓axios 資料 
-//渲染條列到清單上方
-searchCityList.addEventListener('change', getCityData);
 
-function getCityData(e){
-  let city = e.target.value;
-  if(filterData.length !== 0){
-    filterData = [];
-    stationData = [];
-    availibleData =[];
-  };
-
-  axios({
-    method: 'get',
-    url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Station/${city}?$format=JSON`,
-    header: GetAuthorizationHeader()
-}).then(function(res){
-    stationData = res.data;
-    getAvailableCityData(city);
-});
-}
-
-function getAvailableCityData(city){
-  axios({
-    method: 'get',
-    url: `https://ptx.transportdata.tw/MOTC/v2/Bike/Availability/${city}?$format=JSON`,
-    header: GetAuthorizationHeader()
-}).then(function(res){
-    availibleData = res.data; 
-    // console.log(availibleData);
-    
-    availibleData.forEach(availableItem =>{
-        stationData.forEach(stationItem =>{
-            if(availableItem.StationUID === stationItem.StationUID){
-                stationItem.StationTitle = stationItem.StationName.Zh_tw.split("_")[1];
-                stationItem.BikeType = stationItem.StationName.Zh_tw.split("_")[0];
-                stationItem.AvailableRentBikes = availableItem.AvailableRentBikes;
-                stationItem.AvailableReturnBikes = availableItem.AvailableReturnBikes;
-                stationItem.UpdateTime = availableItem.UpdateTime;
-
-                filterData.push(stationItem);
-            };
-        })
-    });
-
-
-    
-    drawBikeStationOnMap(filterData);
-    showBikeStationList(filterData);
-
-    //跑到點擊的城市範圍
-    getCityPosition(city);
-});
-}
-
-//顯示城市的map view
-function getCityPosition(city){
-let lat = '';
-let lng = '';
-
-  totalCityData.forEach(item => {
-    if(item.cityName.En === city){
-      lat = item.cityPosition.lat;
-      lng = item.cityPosition.lon;
-    };
-  });
-
-  map.panTo([lat,lng], 11);
-  map.setView([lat,lng], 11);
-}
 //tdx 資料驗證使用
 function GetAuthorizationHeader() {
   var AppID = 'bbbf44c0e2534c17bbf5553afe5cfb24';
@@ -1831,236 +2068,4 @@ function GetAuthorizationHeader() {
   var Authorization = 'hmac username=\"' + AppID + '\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"' + HMAC + '\"';
 
   return { 'Authorization': Authorization, 'X-Date': GMTString /*,'Accept-Encoding': 'gzip'*/}; //如果要將js運行在伺服器，可額外加入 'Accept-Encoding': 'gzip'，要求壓縮以減少網路傳輸資料量
-}
-
-//減少次數功能測試用
-function init(){
-  longitude = 121.0082785 ;  // 經度 預設為台北市
-  latitude = 23.7072015;  // 緯度
-
-  map.setView([23.7072015,121.0082785], 8); //需要轉乘數字不能用字串格式
-if(tabStatus === 'station'){
-  bikeAvaData.forEach(avaItem =>{
-      bikeCityData.forEach(cityItem =>{
-          if(avaItem.StationUID == cityItem.StationUID){
-              cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
-              cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
-              cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
-              cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
-              cityItem.UpdateTime = avaItem.UpdateTime;
-
-              filterData.push(cityItem);
-          };
-      });
-      });
-      console.log(filterData);
-  drawBikeStationOnMap(filterData);
-  showBikeStationList(filterData);
-
-  renderCityOptionList();
-
-}else{
-  renderCityOptionList()
-  showRouteList(bikeShapeData);
-};
-  
-}
-init();
-//清除資料功能
-
-
-//change tab 切換map 地圖功能標籤
-tabs.addEventListener('click', changeTabs);
-
-function changeTabs(e){
-  tabStatus = e.target.closest('li').dataset.tab;
-  let tabs = document.querySelectorAll('.js-map-tabs li');
-  tabs.forEach(item => {
-    item.classList.remove('active');
-  });
-  e.target.classList.add('active');
-  updateTabContent()
-}
-
-function updateTabContent(){
-  if(tabStatus=== 'station'){
-    tabsBtnGroup.innerHTML =` 
-    <div class="select mb-3">
-      <select id="city" class="form-control js-city-list">
-        <option value="臺北市">臺北市</option>
-      </select>
-    </div>
-    <a
-    href="#"
-    class="
-      btn btn-primary
-      d-flex
-      align-items-center
-      justify-content-center
-      h-50
-      mb-3
-      js-location-btn
-    "
-  >
-    <span class="material-icons me-3"> near_me </span>
-    開啟定位服務
-  </a>
-  <div class="d-flex js-rent-or-return-btn">
-    <h5 class="mb-3 w-50"><a href="#" class="btn btn-success rounded-0 w-100">借車</a></h5>
-    <h5 class="mb-3 w-50" > <a href="#" class="btn btn-light rounded-0 w-100">還車</a></h5>
-  </div>
-  `;
-  tabsRenderList.innerHTML =`
-  <div class="card-body px-0" style="height: calc(100vh - 458px)">
-            <ul
-              class="h-100 overflow-auto js-station-list"
-            >
-  <li class="card border-0 card-list-color p-4 mb-2">
-  <p>請開啟定位，或是選擇地區尋找自行車站牌</p>
-</li>
-</ul>
-<div>`;
-  }else if(tabStatus=== 'route'){
-    tabsBtnGroup.innerHTML =`
-    <ul class="d-flex justify-content-between">
-    <li class="h5 btn btn-success w-30 mb-3">區域路線搜尋</li>
-    <li class="h5 btn btn-light w-30 mb-3">環島路線搜尋</li>
-    <li class="h5 btn btn-light w-30 mb-3">地圖圖層搜尋</li>
-    </ul>
-    
-    <input type="text" class="form-control mb-3" placeholder="請輸入路線關鍵字" />
-    <div class="select mb-3">
-      <select id="city" class="form-control js-route-list">
-        <option value="臺北市">臺北市</option>
-      </select>
-    </div>
-    <a
-    href="#"
-    class="
-      btn btn-primary
-      d-flex
-      align-items-center
-      justify-content-center
-      h-50
-      mb-3
-      js-location-btn
-    "
-  >
-    <span class="material-icons me-3"> search </span>
-    搜尋
-  </a>
-    `;
-    tabsRenderList.innerHTML =`
-    <div class="card-body px-0" style="height: calc(100vh - 515px)">
-    <ul
-      class="h-100 overflow-auto js-route-list"
-    >
-<li class="card border-0 card-list-color p-4 mb-2">
-<p>請輸入關鍵字，或是選擇地區尋找自行車路線</p>
-</li>
-</ul>
-<div>
-    `;
-  };
-}
-
-
-//車道api
-
-function getRouteList(city){
-  axios({
-    method: 'get',
-    url: `https://ptx.transportdata.tw/MOTC/v2/Cycling/Shape/${city}?$format=JSON`,
-    header: GetAuthorizationHeader()
-}).then(function(res){
-    routeData = res.data; 
-    showRouteList(routeData);
-  });
-}
-
-function showRouteList(data){
-  let str = '';
-  data.forEach(item =>{
-    let content = `
-    <li class="card border-0 card-list-color p-3 mb-2" data-id="${item.RouteName}">
-    <div class="d-flex justify-content-between align-items-center flex-wrap border-bottom pb-2 mb-3">
-    <p class="h4">${item.RouteName}</p>
-    <div class="position-relative">
-    <input class="" type="checkbox" name="route checkBox" id="checkBox" />
-    <!-- <span class="material-icons align-middle position-absolute top-50 start-50 translate-middle fs-2">
-    favorite_border
-    </span> -->
-    </div>
-    
-    </div>
-    <div class="d-flex justify-content-between align-items-center gap-3">
-      <div class="d-flex flex-column justify-content-between gap-3">
-      <div class="d-flex gap-5 h-100">
-      <span class="material-icons-outlined">
-      directions_bike
-      </span>
-      <p class="">${item.RoadSectionStart}</p>
-      </div>
-      <div class="d-flex gap-5">
-      <span class="material-icons">
-        flag
-        </span>
-        <p class="">${item.RoadSectionEnd}</p>
-        </div>
-      </div>
-      <p class="btn btn-white rounded-pill w-30">車道長度 </br> <span class="fs-3 fw-bold">${item.CyclingLength}</span> km</p>
-    </div>
-</li>
-`;
-    str += content;
-  })
-
-  routeList.innerHTML = str;  
-}
-
-routeList.addEventListener('click', showRouteOnMap);
-
-function showRouteOnMap(e){
-  if(routeLayer) {
-    map.removeLayer(routeLayer);
-  }
-  //要改為routeData
-  bikeShapeData.forEach(item =>{
-    if(item.RouteName === e.target.closest('li').dataset.id ){
-      geo = item.Geometry;
-    };
-  });
-
-  polyLine(geo);
-}
-
-function polyLine(item){
-   // 建立一個 wkt 的實體
-   const wicket = new Wkt.Wkt();
-   const geojsonFeature = wicket.read(item).toJson()
-   
-   const reverseLatlngs = geojsonFeature.coordinates[0];
-   reverseLatlngs.forEach(item => item.reverse());
-   const antPath = L.polyline.antPath;
-  routeLayer = antPath(reverseLatlngs,{
-     paused: false,
-    reverse: false,
-    delay: 2000,
-    dashArray: [10, 20],
-    weight: 6,
-    opacity: 0.5
-   });
- 
-  routeLayer.addTo(map);
-   // zoom the map to the layer
-   map.fitBounds(routeLayer.getBounds());
- 
-}
-
-function removeMarkers() {
-  map.eachLayer((layer) => {
-    if (layer instanceof L.Marker) {
-      map.removeLayer(layer)
-    }
-  })
 }
