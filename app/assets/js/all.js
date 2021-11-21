@@ -1480,7 +1480,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 
 //地圖標示的icon
 var greenIcon = new L.Icon({
-iconUrl: require('../../assets/images/icon-green.svg'),
+iconUrl: require('../../assets/images/icon-green.png'),
 iconSize: [50, 50],
 iconAnchor: [12, 41],
 popupAnchor: [1, -34],
@@ -1488,7 +1488,7 @@ shadowSize: [41, 41]
 });
 
 var redIcon = new L.Icon({
-  iconUrl: require('../../assets/images/icon-red.svg'),
+  iconUrl: require('../../assets/images/icon-red.png'),
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
