@@ -1403,14 +1403,14 @@ var blueIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 var startIconPic = new L.Icon({
-  iconUrl: './assets/images/icon-flag.svg',
+  iconUrl: './assets/images/icon-bike.svg',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
 var endIconPic = new L.Icon({
-  iconUrl: './assets/images/icon-bike.svg',
+  iconUrl: './assets/images/icon-flag.svg',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -1586,20 +1586,29 @@ function polyLine(geo) {
   routeLayer.addTo(map); // zoom the map to the layer
 
   map.fitBounds(routeLayer.getBounds());
+  var markIcon = null;
+
+  if (routeStart === routeEnd) {
+    markIcon = startIconPic;
+  } else {
+    markIcon = endIconPic;
+  }
+
+  ;
   addStartIcon();
-  addEndIcon();
+  addEndIcon(markIcon);
 }
 
 function addStartIcon() {
   startIcon = new L.marker(routeStart, {
     icon: startIconPic
-  }).bindPopup("<div class=\"start-popup route-popup\">\n        <h2>".concat(routeName, "</h2>\n        <div class=\"info\">\n          <span>\u8D77\u9EDE</span>\n          <p>").concat(routeStartName, "</p>\n        </div>\n      </div>\n    ")).addTo(map);
+  }).bindPopup("<div class=\"mb-0 p-5 flex-column\">\n        <h3 class=\"h3\">".concat(routeName, "</h3>\n      <div class=\"d-flex justify-content-between align-items-center w-100\">\n        <h2 class=\"h6\">").concat(routeStartName, "</h2>\n        <h5 class=\"badge fs-7 bg-success text-primary\">\u8D77\u9EDE</h5>\n      </div>\n    </div>\n    ")).addTo(map);
 }
 
-function addEndIcon() {
+function addEndIcon(markIcon) {
   endIcon = new L.marker(routeEnd, {
-    icon: endIconPic
-  }).bindPopup("<div class=\"start-popup route-popup\">\n        <h2>".concat(routeName, "</h2>\n        <div class=\"info\">\n          <span>\u8D77\u9EDE</span>\n          <p>").concat(routeEndName, "</p>\n        </div>\n      </div>\n    ")).addTo(map);
+    icon: markIcon
+  }).bindPopup("<div class=\"mb-0 p-5 flex-column\">\n      <h3 class=\"h3\">".concat(routeName, "</h3>\n      <div class=\"d-flex justify-content-between align-items-center w-100\">\n        <h2 class=\"h6\">").concat(routeEndName, "</h2>\n        <h5 class=\"badge fs-7 bg-warning-3 text-warning\">\u7D42\u9EDE</h5>\n      </div>\n    </div>\n    ")).addTo(map);
 } //station tab
 
 
@@ -1850,7 +1859,7 @@ function removeMarkers() {
 
 function changeRentTab(e) {
   rentTab = e.target.dataset.rentTab;
-} //減少次數功能測試用
+} //初始化
 
 
 function init() {
