@@ -18705,6 +18705,10 @@ button:focus {
   background-color: #129995;
 }
 
+.leaflet-control-attribution {
+  display: none;
+}
+
 .marker-cluster-small {
   background-color: rgba(181, 226, 140, 0.6);
 }
