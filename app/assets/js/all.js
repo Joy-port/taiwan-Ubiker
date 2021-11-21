@@ -1525,7 +1525,7 @@ var blueIcon = new L.Icon({
 });
 
 var startIconPic = new L.Icon({
-  iconUrl: './assets/images/icon-flag.svg',
+  iconUrl: './assets/images/icon-bike.svg',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -1533,7 +1533,7 @@ var startIconPic = new L.Icon({
 });
 
 var endIconPic = new L.Icon({
-  iconUrl: './assets/images/icon-bike.svg',
+  iconUrl: './assets/images/icon-flag.svg',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -1747,34 +1747,42 @@ function polyLine(geo){
    routeLayer.addTo(map);
    // zoom the map to the layer
   map.fitBounds(routeLayer.getBounds());
+
+  let markIcon = null;
+  if(routeStart === routeEnd){
+    markIcon = startIconPic;
+  }else{
+    markIcon = endIconPic;
+  };
   addStartIcon();
-  addEndIcon();
+  addEndIcon(markIcon);
+
 }
 
 function addStartIcon(){
 
  startIcon = new L.marker(routeStart, { icon: startIconPic }).bindPopup(
-    `<div class="start-popup route-popup">
-        <h2>${routeName}</h2>
-        <div class="info">
-          <span>起點</span>
-          <p>${routeStartName}</p>
-        </div>
+    `<div class="mb-0 p-5 flex-column">
+        <h3 class="h3">${routeName}</h3>
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <h2 class="h6">${routeStartName}</h2>
+        <h5 class="badge fs-7 bg-success text-primary">起點</h5>
       </div>
+    </div>
     `
   ).addTo(map);
 
 }
 
-function addEndIcon(){
- endIcon = new L.marker(routeEnd, { icon: endIconPic }).bindPopup(
-    `<div class="start-popup route-popup">
-        <h2>${routeName}</h2>
-        <div class="info">
-          <span>起點</span>
-          <p>${routeEndName}</p>
-        </div>
+function addEndIcon(markIcon){
+ endIcon = new L.marker(routeEnd, { icon: markIcon }).bindPopup(
+    `<div class="mb-0 p-5 flex-column">
+      <h3 class="h3">${routeName}</h3>
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <h2 class="h6">${routeEndName}</h2>
+        <h5 class="badge fs-7 bg-warning-3 text-warning">終點</h5>
       </div>
+    </div>
     `
   ).addTo(map);
 }
@@ -2076,7 +2084,7 @@ function changeRentTab(e){
   rentTab = e.target.dataset.rentTab;
 }
 
-//減少次數功能測試用
+//初始化
 function init(){
   //地圖位置預設
   longitude = 121.0082785 ;  // 經度 預設為台北市
