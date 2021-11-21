@@ -1479,20 +1479,33 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 }).addTo(map);
 
 //地圖標示的icon
-const mapIcon = L.Icon.extend({
-  options: {
-      iconSize: [50, 50],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-  }
+
+var greenIcon = new L.Icon({
+iconUrl: '../../assets/images/icon-green.png',
+iconSize: [50, 50],
+iconAnchor: [12, 41],
+popupAnchor: [1, -34],
+shadowSize: [41, 41]
 });
-const greenIcon = new mapIcon({iconUrl: '../../assets/images/icon-green.png'}),
-    redIcon = new mapIcon({iconUrl: '../../assets/images/icon-red.png'}),
-    grayIcon = new mapIcon({iconUrl: '../../assets/images/icon-gray.png'});
+
+var redIcon = new L.Icon({
+  iconUrl: '../../assets/images/icon-red.png',
+  iconSize: [50, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var grayIcon = new L.Icon({
+  iconUrl: '../../assets/images/icon-gray.svg',
+  iconSize: [50, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 //代表當場位置
-const blueIcon = new L.Icon({
+var blueIcon = new L.Icon({
   iconUrl: '../../assets/images/icon-location.svg',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [25, 41],
