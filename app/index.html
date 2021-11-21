@@ -5,10 +5,10 @@ engine: ejs
 current: index
 ---
 
-<div class="position-relative" style="height: calc(100vh - 84px)">
+<div class="position-relative overflow-hidden" style="height: calc(100vh - 84px)">
   <div class="h-100 w-100" id="map"></div>
   <div
-    class="position-absolute start-0 top-75 top-lg-0 h-100 w-100 px-lg-5 py-lg-3 ms-lg-2 w-lg-40 js-expend-box transition-top"
+    class="position-absolute start-0 top-80 top-lg-0 h-100 w-100 px-lg-5 py-lg-3 ms-lg-2 w-lg-40 js-expend-box transition-top"
     style="z-index: 800;"
   >
   <!-- 完全收合
@@ -42,25 +42,31 @@ current: index
           </ul> -->
 <!--           
           <input type="text" class="form-control mb-3" placeholder="請輸入路線關鍵字" /> -->
-          <div class="select mb-3">
-            <select id="city" class="form-control js-city-list">
-              <option value="臺北市">臺北市</option>
-            </select>
+          <div class="row">
+            <div class="col-6 col-lg-12">
+              <div class="select me-3 mb-3 w-100">
+                <select id="city" class="form-control js-city-list">
+                  <option value="臺北市">臺北市</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-4 offset-1 col-lg-12">
+              <a
+              href="#"
+              class="
+                btn btn-primary
+                d-flex
+                align-items-center
+                justify-content-center
+                mb-3
+                js-location-btn
+              "
+            >
+              <span class="material-icons me-3 ms-0"> search </span>
+              搜尋
+            </a>
+            </div>
           </div>
-          <a
-          href="#"
-          class="
-            btn btn-primary
-            d-flex
-            align-items-center
-            justify-content-center
-            mb-3
-            js-location-btn
-          "
-        >
-          <span class="material-icons me-3"> search </span>
-          搜尋
-        </a>
         <!-- tabs rent station
           <a
             href="#"

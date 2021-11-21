@@ -2115,7 +2115,7 @@ expendBtn.addEventListener('click' , changeExpendStatus);
 function changeExpendStatus(e){
 const btnContent = document.querySelector('.js-expend-btn span')
   if(e.target.nodeName ==="SPAN" || e.target.nodeName === "BUTTON"){
-    expendBox.classList.toggle('top-75');
+    expendBox.classList.toggle('top-80');
     expendBox.classList.toggle('top-50');
 
     if(expendBox.classList.contains('top-50')){
