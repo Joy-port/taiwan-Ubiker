@@ -18705,8 +18705,32 @@ button:focus {
   background-color: #129995;
 }
 
-.leaflet-control-attribution {
+.leaflet-control-attribution .leaflet-control a {
+  padding: 0;
+}
+
+.leaflet-container .leaflet-control-attribution {
+  background-color: transparent;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-writing-mode: vertical-rl;
+      -ms-writing-mode: tb-rl;
+          writing-mode: vertical-rl;
+  width: 20px;
   display: none;
+}
+
+@media (min-width: 992px) {
+  .leaflet-container .leaflet-control-attribution {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+
+.leaflet-control-attribution, .leaflet-control-scale-line {
+  padding: 0;
 }
 
 .marker-cluster-small {
