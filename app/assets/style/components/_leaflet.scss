@@ -114,6 +114,22 @@
   background-color: #129995;
 }
 
-.leaflet-control-attribution{
+.leaflet-control-attribution .leaflet-control a{
+  padding: 0;
+
+
+}
+.leaflet-container .leaflet-control-attribution{
+  background-color: transparent;
+  align-items: center;
+  writing-mode: vertical-rl;
+  width: 20px;
   display: none;
+  @include media-breakpoint-up(lg) {
+    display: flex;
+  }
+  }
+
+.leaflet-control-attribution, .leaflet-control-scale-line {
+  padding: 0;
 }
