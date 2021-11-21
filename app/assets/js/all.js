@@ -1479,20 +1479,12 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 }).addTo(map);
 
 //地圖標示的icon
-var darkGreenIcon = new L.Icon({
+var greenIcon = new L.Icon({
 iconUrl: '../../assets/images/icon-green.svg',
 iconSize: [50, 50],
 iconAnchor: [12, 41],
 popupAnchor: [1, -34],
 shadowSize: [41, 41]
-});
-
-var lightGreenIcon = new L.Icon({
-  iconUrl: '../../assets/images/icon-green.svg',
-  iconSize: [50, 50],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
 });
 
 var redIcon = new L.Icon({
@@ -1661,13 +1653,13 @@ function showRouteList(data){
       <span class="material-icons-outlined">
       directions_bike
       </span>
-      <p class="">${item.RoadSectionStart}</p>
+      <p class="">${item.RoadSectionStart=== undefined ? '---' : item.RoadSectionStart}</p>
       </div>
       <div class="d-flex gap-5">
       <span class="material-icons">
         flag
         </span>
-        <p class="">${item.RoadSectionEnd}</p>
+        <p class="">${item.RoadSectionEnd=== undefined ? '---' : item.RoadSectionEnd}</p>
         </div>
       </div>
       <p class="btn btn-white rounded-pill w-30">車道長度 </br> <span class="fs-3 fw-bold">${item.CyclingLength}</span> km</p>
@@ -1684,7 +1676,7 @@ function showRouteOnMap(e){
   if(routeLayer) {
     map.removeLayer(routeLayer);
   }
-  //要改為routeData
+  //要改為filterData
   bikeShapeData.forEach(item =>{
     if(item.RouteName === e.target.closest('li').dataset.id ){
       geo = item.Geometry;
@@ -1694,10 +1686,11 @@ function showRouteOnMap(e){
   polyLine(geo);
 }
 //分解路線經緯線內容轉為一條線
-function polyLine(item){
+function polyLine(geo){
    // 建立一個 wkt 的實體
+   //要改為filterData
    const wicket = new Wkt.Wkt();
-   const geojsonFeature = wicket.read(item).toJson()
+   const geojsonFeature = wicket.read(geo).toJson()
    
    const reverseLatlngs = geojsonFeature.coordinates[0];
    reverseLatlngs.forEach(item => item.reverse());
@@ -1878,14 +1871,12 @@ function drawBikeStationOnMap(data){
         });
       },
     });
-  rentTab = 'rent';
+  // rentTab = 'rent';
   data.forEach(item => {
     //先用可借的數量來做判斷
-    if(parseInt(item.AvailableRentBikes)> 5){
-        markColor = darkGreenIcon;
-    }else if(parseInt(item.AvailableRentBikes)<= 5 &&  parseInt(item.AvailableRentBikes)> 0){
-        markColor = lightGreenIcon;
-    }else{
+    if(parseInt(item.AvailableRentBikes)>0){
+        markColor = greenIcon;
+    }else if(parseInt(item.AvailableRentBikes)<0){
         markColor = redIcon;
     };
       markers.addLayer(L.marker([item.StationPosition.PositionLat,item.StationPosition.PositionLon], {icon: markColor})
@@ -1908,67 +1899,6 @@ function drawBikeStationOnMap(data){
       .addTo(map)
       .on('click',getClickPosition);
   });
-  // if(rentTab === 'rent'){
-  //   data.forEach(item => {
-  //     //先用可借的數量來做判斷
-  //     if(parseInt(item.AvailableRentBikes)> 5){
-  //         markColor = darkGreenIcon;
-  //     }else if(parseInt(item.AvailableRentBikes)<= 5 &&  parseInt(item.AvailableRentBikes)> 0){
-  //         markColor = lightGreenIcon;
-  //     }else{
-  //         markColor = redIcon;
-  //     };
-  //       markers.addLayer(L.marker([item.StationPosition.PositionLat,item.StationPosition.PositionLon], {icon: markColor})
-  //        .bindPopup(`
-  //            <h1>${item.StationTitle}</h1>
-  //            <div>
-  //            <p class="${item.ServiceType === 1 ? 'text-primary':stationItem.ServiceType===2? 'text-warning': 'text-danger'}">&bull; ${item.ServiceType === 1 ? '正常營運':stationItem.ServiceType===2? '暫停營運': '停止營運'}</p>
-  //            <p>${item.BikeType}</p>
-  //            </div>
-  //            <div>
-  //                <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
-  //                    <p>可租借</p>
-  //                    <p>${item.AvailableRentBikes} </p>
-  //                </a>
-  //                <a href="#" id="${parseInt(item.AvailableReturnBikes)>5 ?'btn-primary':parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)>0 ? 'btn-secondary' :'btn-danger'}">
-  //                    <p>可歸還</p>
-  //                    <p>${item.AvailableReturnBikes}</p>
-  //                </a>
-  //            </div>`))
-  //       .addTo(map)
-  //       .on('click',getClickPosition);
-  //   });
-  // }else if(rentTab === 'return'){
-  //   data.forEach(item => {
-  //     //先用可借的數量來做判斷
-  //     if(parseInt(item.AvailableReturnBikes)> 5){
-  //         markColor = darkGreenIcon;
-  //     }else if(parseInt(item.AvailableReturnBikes)<= 5 &&  parseInt(item.AvailableReturnBikes)> 0){
-  //         markColor = lightGreenIcon;
-  //     }else{
-  //         markColor = redIcon;
-  //     };
-  //       markers.addLayer(L.marker([item.StationPosition.PositionLat,item.StationPosition.PositionLon], {icon: markColor})
-  //        .bindPopup(`
-  //            <h1>${item.StationTitle}</h1>
-  //            <div>
-  //            <p class="${item.ServiceType === 1 ? 'text-primary':stationItem.ServiceType===2? 'text-warning': 'text-danger'}">&bull; ${item.ServiceType === 1 ? '正常營運':stationItem.ServiceType===2? '暫停營運': '停止營運'}</p>
-  //            <p>${item.BikeType}</p>
-  //            </div>
-  //            <div>
-  //                <a href="#" id="${parseInt(item.AvailableRentBikes)>5 ?'btn-primary': parseInt(item.AvailableRentBikes)<=5 && parseInt(item.AvailableRentBikes)> 0 ? 'btn-secondary' :'btn-danger'}">
-  //                    <p>可租借</p>
-  //                    <p>${item.AvailableRentBikes} </p>
-  //                </a>
-  //                <a href="#" id="${parseInt(item.AvailableReturnBikes)>5 ?'btn-primary':parseInt(item.AvailableReturnBikes)<=5 && parseInt(item.AvailableReturnBikes)>0 ? 'btn-secondary' :'btn-danger'}">
-  //                    <p>可歸還</p>
-  //                    <p>${item.AvailableReturnBikes}</p>
-  //                </a>
-  //            </div>`))
-  //       .addTo(map)
-  //       .on('click',getClickPosition);
-  //   });
-  // }
 
   map.addLayer(markers);
 }
@@ -2020,11 +1950,9 @@ function showStationOnMap(e){
       lon = item.StationPosition.PositionLon;
       lat = item.StationPosition.PositionLat;
 
-      if(parseInt(item.AvailableRentBikes)> 5){
-        markColor = darkGreenIcon;
-    }else if(parseInt(item.AvailableRentBikes)<= 5 &&  parseInt(item.AvailableRentBikes)> 0){
-        markColor = lightGreenIcon;
-    }else{
+    if(parseInt(item.AvailableRentBikes)>0){
+        markColor = greenIcon;
+    }else if(parseInt(item.AvailableRentBikes)<0){
         markColor = redIcon;
     };
     L.marker([lat,lon], {icon: markColor})
