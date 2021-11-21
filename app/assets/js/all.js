@@ -1572,10 +1572,14 @@ function updateTabContent(){
     filterData = [];
   };
   
+
   //抓資料用
   // getRouteData();
   //測試用
   showRouteList(bikeShapeData);
+
+  contentList.removeEventListener('click', showStationOnMap);
+
   contentList.addEventListener('click', showRouteOnMap);
   // searchCityList.addEventListener('change', getRouteData);
 
@@ -1679,7 +1683,7 @@ function showRouteList(data){
 
 //用戶點擊路線之後，在地圖上畫路出線圖
 function showRouteOnMap(e){
-  console.log(routeLayer);
+
   if(routeLayer) {
     map.removeLayer(routeLayer);
   }
@@ -1691,6 +1695,7 @@ function showRouteOnMap(e){
   });
 
   polyLine(geo);
+
 }
 //分解路線經緯線內容轉為一條線
 function polyLine(geo){
@@ -1710,11 +1715,9 @@ function polyLine(geo){
     weight: 6,
     opacity: 0.5
    });
- 
-  routeLayer.addTo(map);
+   routeLayer.addTo(map);
    // zoom the map to the layer
-   map.fitBounds(routeLayer.getBounds());
- 
+  map.fitBounds(routeLayer.getBounds());
 }
 
 //station tab
