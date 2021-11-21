@@ -1335,6 +1335,13 @@ var rentTab = 'rent';
 var city = 'Taipei';
 var routeLayer = null;
 var geo = null;
+var routeName = '';
+var routeStart = null;
+var routeEnd = null;
+var routeStartName = '';
+var routeEndName = '';
+var startIcon = [];
+var endIcon = [];
 var stationData = [];
 var availibleData = [];
 var filterData = [];
@@ -1366,21 +1373,21 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 }).addTo(map); //地圖標示的icon
 
 var greenIcon = new L.Icon({
-  iconUrl: './assets/images/icon-green.png',
+  iconUrl: './assets/images/icon-green.svg',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
 var redIcon = new L.Icon({
-  iconUrl: './assets/images/icon-red.png',
+  iconUrl: './assets/images/icon-red.svg',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
 var grayIcon = new L.Icon({
-  iconUrl: './assets/images/icon-gray.png',
+  iconUrl: './assets/images/icon-gray.svg',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -1391,6 +1398,20 @@ var blueIcon = new L.Icon({
   iconUrl: '../../assets/images/icon-location.svg',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
   iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+var startIconPic = new L.Icon({
+  iconUrl: './assets/images/icon-flag.svg',
+  iconSize: [50, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+var endIconPic = new L.Icon({
+  iconUrl: './assets/images/icon-bike.svg',
+  iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
@@ -1451,13 +1472,12 @@ function updateTabContent() {
     }
 
     ; //抓資料用
+    // getRouteData();
+    //測試用
 
-    getRouteData(); //測試用
-    // showRouteList(bikeShapeData);
-
+    showRouteList(bikeShapeData);
     contentList.removeEventListener('click', showStationOnMap);
-    contentList.addEventListener('click', showRouteOnMap);
-    searchCityList.addEventListener('change', getRouteData);
+    contentList.addEventListener('click', showRouteOnMap); // searchCityList.addEventListener('change', getRouteData);
   } else if (tabStatus === 'station') {
     locationBtn.innerHTML = " \n    <span class=\"material-icons me-3\"> near_me </span>\n    \u958B\u555F\u5B9A\u4F4D\u670D\u52D9\n  ";
     tabsRenderList.style.height = 'calc(100vh - 400px)';
@@ -1469,29 +1489,29 @@ function updateTabContent() {
     }
 
     ; //抓資料用
+    // getStationData();
+    //測試用
 
-    getStationData(); //測試用
-    //   bikeAvaData.forEach(avaItem =>{
-    //     bikeCityData.forEach(cityItem =>{
-    //         if(avaItem.StationUID == cityItem.StationUID){
-    //             cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
-    //             cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
-    //             cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
-    //             cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
-    //             cityItem.UpdateTime = avaItem.UpdateTime;
-    //             filterData.push(cityItem);
-    //         };
-    //     });
-    //     });
-    // drawBikeStationOnMap(filterData);
-    // showBikeStationList(filterData);
+    bikeAvaData.forEach(function (avaItem) {
+      bikeCityData.forEach(function (cityItem) {
+        if (avaItem.StationUID == cityItem.StationUID) {
+          cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
+          cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
+          cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
+          cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
+          cityItem.UpdateTime = avaItem.UpdateTime;
+          filterData.push(cityItem);
+        }
 
+        ;
+      });
+    });
+    drawBikeStationOnMap(filterData);
+    showBikeStationList(filterData);
     searchCityList.removeEventListener('change', getRouteData);
     contentList.removeEventListener('click', showRouteOnMap);
-    contentList.addEventListener('click', showStationOnMap);
-    searchCityList.addEventListener('change', getStationData); //預設抓台北資料 || select 清單
-
-    locationBtn.addEventListener('click', getCurrentPosition); //開啟定位資訊
+    contentList.addEventListener('click', showStationOnMap); // searchCityList.addEventListener('change', getStationData); //預設抓台北資料 || select 清單
+    // locationBtn.addEventListener('click', getCurrentPosition); //開啟定位資訊
   }
 
   ;
@@ -1530,9 +1550,12 @@ function showRouteList(data) {
 function showRouteOnMap(e) {
   removeRouteLayers(); //要改為filterData
 
-  filterData.forEach(function (item) {
+  bikeShapeData.forEach(function (item) {
     if (item.RouteName === e.target.closest('li').dataset.id) {
       geo = item.Geometry;
+      routeName = item.RouteName;
+      routeStartName = item.RoadSectionStart;
+      routeEndName = item.RoadSectionEnd;
     }
 
     ;
@@ -1543,9 +1566,10 @@ function showRouteOnMap(e) {
 
 function polyLine(geo) {
   // 建立一個 wkt 的實體
-  //要改為filterData
   var wicket = new Wkt.Wkt();
   var geojsonFeature = wicket.read(geo).toJson();
+  routeStart = geojsonFeature.coordinates[0][0];
+  routeEnd = geojsonFeature.coordinates[0][geojsonFeature.coordinates[0].length - 1];
   var reverseLatlngs = geojsonFeature.coordinates[0];
   reverseLatlngs.forEach(function (item) {
     return item.reverse();
@@ -1562,6 +1586,20 @@ function polyLine(geo) {
   routeLayer.addTo(map); // zoom the map to the layer
 
   map.fitBounds(routeLayer.getBounds());
+  addStartIcon();
+  addEndIcon();
+}
+
+function addStartIcon() {
+  startIcon = new L.marker(routeStart, {
+    icon: startIconPic
+  }).bindPopup("<div class=\"start-popup route-popup\">\n        <h2>".concat(routeName, "</h2>\n        <div class=\"info\">\n          <span>\u8D77\u9EDE</span>\n          <p>").concat(routeStartName, "</p>\n        </div>\n      </div>\n    ")).addTo(map);
+}
+
+function addEndIcon() {
+  endIcon = new L.marker(routeEnd, {
+    icon: endIconPic
+  }).bindPopup("<div class=\"start-popup route-popup\">\n        <h2>".concat(routeName, "</h2>\n        <div class=\"info\">\n          <span>\u8D77\u9EDE</span>\n          <p>").concat(routeEndName, "</p>\n        </div>\n      </div>\n    ")).addTo(map);
 } //station tab
 
 
@@ -1793,6 +1831,8 @@ function showStationOnMap(e) {
 function removeRouteLayers() {
   if (routeLayer) {
     map.removeLayer(routeLayer);
+    map.removeLayer(startIcon);
+    map.removeLayer(endIcon);
   }
 
   ;
@@ -1825,9 +1865,9 @@ function init() {
   tabStatus = 'route'; // 更新樣式+互動效果
 
   updateTabContent();
-} // init();
-//tdx 資料驗證使用
+}
 
+init(); //tdx 資料驗證使用
 
 function GetAuthorizationHeader() {
   var AppID = 'bbbf44c0e2534c17bbf5553afe5cfb24';
