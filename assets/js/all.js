@@ -1370,7 +1370,7 @@ var greenIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 var redIcon = new L.Icon({
-  iconUrl: '../../assets/images/icon-red.svg',
+  iconUrl: '../../assets/images/icon-red.png',
   iconSize: [50, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
