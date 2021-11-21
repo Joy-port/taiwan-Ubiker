@@ -54,10 +54,24 @@
 <div class="position-relative" style="height: calc(100vh - 84px)">
   <div class="h-100 w-100" id="map"></div>
   <div
-    class="position-absolute top-0 start-0 h-100 px-5 py-3 ms-2"
-    style="width: 37%; z-index: 800"
+    class="position-absolute start-0 top-75 top-lg-0 h-100 w-100 px-lg-5 py-lg-3 ms-lg-2 w-lg-40 js-expend-box transition-top"
+    style="z-index: 800;"
   >
-    <div class="card card-shadow pt-4 p-3">
+  <!-- 完全收合
+    transform: translateY(858px)
+    展開搜尋欄位
+    transform: translateY(670px)
+    展開搜尋結果 100%
+    transform: translateY(0px)
+   -->
+    <div class="card card-shadow pt-4 p-3 h-100">
+
+      <button class="btn border-0 pt-0 pb-3 d-lg-none js-expend-btn">
+        <span class="material-icons-outlined fs-3 transition-all">
+        expand_less
+        </span>
+      </button>
+
       <ul class="d-flex justify-content-around mb-3 js-map-tabs">
         <li class="h3 text-center active card-border-bottom-hover-primary-2 pb-2 w-50" data-tab ="route">
               自行車路線
@@ -86,7 +100,6 @@
             d-flex
             align-items-center
             justify-content-center
-            h-50
             mb-3
             js-location-btn
           "
