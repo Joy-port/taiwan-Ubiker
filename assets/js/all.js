@@ -1,10 +1,7 @@
 "use strict";
 
-var _testData = require("./testData.js");
-
-//bbbf44c0e2534c17bbf5553afe5cfb24
-//YLongjG_6wqXgBm5FQ4LIpW7bPQ
-console.log(_testData.bikeCityData, _testData.bikeAvaData, _testData.bikeShapeData);
+// import { bikeCityData ,bikeAvaData, bikeShapeData } from './testData.js';
+// console.log(bikeCityData,bikeAvaData,bikeShapeData);
 var totalCityData = [{
   cityName: {
     Ch: '臺北市',
