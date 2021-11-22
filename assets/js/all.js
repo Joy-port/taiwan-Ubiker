@@ -1415,6 +1415,27 @@ var endIconPic = new L.Icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
+}); //群組化
+
+var markers = L.markerClusterGroup({
+  iconCreateFunction: function iconCreateFunction(cluster) {
+    var markers = cluster.getAllChildMarkers();
+    var c = ' marker-cluster-';
+
+    if (markers.length <= 5 && markers.length > 0) {
+      c += 'small';
+    } else if (markers.length <= 15 && markers.length > 5) {
+      c += 'medium';
+    } else {
+      c += 'large';
+    }
+
+    return L.divIcon({
+      html: "<div class=\"d-flex justify-content-center align-items-center marker-cluster\">".concat(markers.length, "</div>"),
+      className: "marker-cluster" + c,
+      iconSize: L.point(40, 40)
+    });
+  }
 }); //全域route & station 切換分頁功能
 //change tab 切換map 地圖功能標籤
 
@@ -1442,6 +1463,7 @@ function renderCityOptionList() {
 
 function getCityName(e) {
   city = e.target.value || 'Taipei';
+  searchCityList.value = city;
 } //將點擊到的清單增加樣式
 
 
@@ -1458,12 +1480,11 @@ function addActiveColor(e) {
 
 
 function updateTabContent() {
-  renderCityOptionList();
-  searchCityList.addEventListener('change', getCityName);
-
   if (tabStatus === 'route') {
     locationBtn.innerHTML = " \n    <span class=\"material-icons me-3\"> search </span>\n      \u641C\u5C0B\n  ";
     tabsRenderList.style.height = 'calc(100vh - 400px)';
+    renderCityOptionList();
+    searchCityList.addEventListener('change', getCityName);
     removeRouteLayers();
     removeMarkers();
 
@@ -1472,15 +1493,18 @@ function updateTabContent() {
     }
 
     ; //抓資料用
-    // getRouteData();
-    //測試用
 
-    showRouteList(bikeShapeData);
+    getRouteData(); //測試用
+    // showRouteList(bikeShapeData);
+
     contentList.removeEventListener('click', showStationOnMap);
-    contentList.addEventListener('click', showRouteOnMap); // searchCityList.addEventListener('change', getRouteData);
+    contentList.addEventListener('click', showRouteOnMap);
+    searchCityList.addEventListener('change', getRouteData);
   } else if (tabStatus === 'station') {
     locationBtn.innerHTML = " \n    <span class=\"material-icons me-3\"> near_me </span>\n    \u958B\u555F\u5B9A\u4F4D\u670D\u52D9\n  ";
     tabsRenderList.style.height = 'calc(100vh - 400px)';
+    renderCityOptionList();
+    searchCityList.addEventListener('change', getCityName);
     removeRouteLayers();
     removeMarkers();
 
@@ -1489,29 +1513,29 @@ function updateTabContent() {
     }
 
     ; //抓資料用
-    // getStationData();
-    //測試用
 
-    bikeAvaData.forEach(function (avaItem) {
-      bikeCityData.forEach(function (cityItem) {
-        if (avaItem.StationUID == cityItem.StationUID) {
-          cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
-          cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
-          cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
-          cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
-          cityItem.UpdateTime = avaItem.UpdateTime;
-          filterData.push(cityItem);
-        }
+    getStationData(); //測試用
+    // bikeAvaData.forEach(avaItem =>{
+    //   bikeCityData.forEach(cityItem =>{
+    //       if(avaItem.StationUID == cityItem.StationUID){
+    //           cityItem.StationTitle = cityItem.StationName.Zh_tw.split("_")[1];
+    //           cityItem.BikeType = cityItem.StationName.Zh_tw.split("_")[0];
+    //           cityItem.AvailableRentBikes = avaItem.AvailableRentBikes;
+    //           cityItem.AvailableReturnBikes = avaItem.AvailableReturnBikes;
+    //           cityItem.UpdateTime = avaItem.UpdateTime;
+    //           filterData.push(cityItem);
+    //       };
+    //   });
+    //   });
+    // drawBikeStationOnMap(filterData);
+    // showBikeStationList(filterData);
 
-        ;
-      });
-    });
-    drawBikeStationOnMap(filterData);
-    showBikeStationList(filterData);
     searchCityList.removeEventListener('change', getRouteData);
     contentList.removeEventListener('click', showRouteOnMap);
-    contentList.addEventListener('click', showStationOnMap); // searchCityList.addEventListener('change', getStationData); //預設抓台北資料 || select 清單
-    // locationBtn.addEventListener('click', getCurrentPosition); //開啟定位資訊
+    contentList.addEventListener('click', showStationOnMap);
+    searchCityList.addEventListener('change', getStationData); //預設抓台北資料 || select 清單
+
+    locationBtn.addEventListener('click', getCurrentPosition); //開啟定位資訊
   }
 
   ;
@@ -1550,7 +1574,7 @@ function showRouteList(data) {
 function showRouteOnMap(e) {
   removeRouteLayers(); //要改為filterData
 
-  bikeShapeData.forEach(function (item) {
+  filterData.forEach(function (item) {
     if (item.RouteName === e.target.closest('li').dataset.id) {
       geo = item.Geometry;
       routeName = item.RouteName;
@@ -1747,34 +1771,13 @@ function getAvailableData(longitude, latitude) {
 
 
 function drawBikeStationOnMap(inputData) {
-  var markColor = ''; //群組化
-
-  var markers = L.markerClusterGroup({
-    iconCreateFunction: function iconCreateFunction(cluster) {
-      var markers = cluster.getAllChildMarkers();
-      var c = ' marker-cluster-';
-
-      if (markers.length <= 5 && markers.length > 0) {
-        c += 'small';
-      } else if (markers.length <= 15 && markers.length > 5) {
-        c += 'medium';
-      } else {
-        c += 'large';
-      }
-
-      return L.divIcon({
-        html: "<div class=\"d-flex justify-content-center align-items-center marker-cluster\">".concat(markers.length, "</div>"),
-        className: "marker-cluster" + c,
-        iconSize: L.point(40, 40)
-      });
-    }
-  }); // rentTab = 'rent';
+  var markColor = ''; // rentTab = 'rent';
 
   inputData.forEach(function (item) {
     //先用可借的數量來做判斷
     if (parseInt(item.AvailableRentBikes) > 0) {
       markColor = greenIcon;
-    } else if (parseInt(item.AvailableRentBikes) < 0) {
+    } else if (parseInt(item.AvailableRentBikes) <= 0) {
       markColor = redIcon;
     }
 
