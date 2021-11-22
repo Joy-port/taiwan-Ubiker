@@ -1,6 +1,6 @@
 
 //測試用資料
-export let bikeCityData =[
+let bikeCityData =[
     {
       "StationUID": "TPE0001",
       "StationID": "0001",
@@ -662,7 +662,7 @@ export let bikeCityData =[
       "UpdateTime": "2021-11-18T13:05:29+08:00"
     }
   ];
-export let bikeAvaData=[
+let bikeAvaData=[
 {
     "StationUID": "TPE0001",
     "StationID": "0001",
@@ -964,7 +964,7 @@ export let bikeAvaData=[
     "UpdateTime": "2021-11-18T13:04:29+08:00"
 }
 ];
-export let bikeShapeData =[
+let bikeShapeData =[
 {
     "RouteName": "三元街(東北側1)",
     "AuthorityName": "臺北市政府",
@@ -1320,3 +1320,5 @@ export let bikeShapeData =[
     "Geometry": "MULTILINESTRING ((121.567357783199 24.9855960967387,121.568259004683 24.9867679288557))"
 }
 ];
+
+export { bikeCityData ,bikeAvaData, bikeShapeData };
