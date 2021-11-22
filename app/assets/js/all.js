@@ -150,7 +150,6 @@ const expendBtn = document.querySelector('.js-expend-btn');
 const expendBox = document.querySelector('.js-expend-box');
 
 
-
 //初始畫面
 let map = L.map('map', {
     center: [25.0408578889,121.567904444],
@@ -243,7 +242,7 @@ let markers = L.markerClusterGroup({
 
 //全域route & station 切換分頁功能
 //change tab 切換map 地圖功能標籤
-tabs.addEventListener('click', changeTabs);
+
 
 //切換tab時增加樣式
 function changeTabs(e){
@@ -268,7 +267,7 @@ function renderCityOptionList(){
 }
 
 function getCityName(e){
-  city = e.target.value || 'Taipei';
+  city = e.target.value;
   searchCityList.value = city;
 }
 
@@ -287,7 +286,6 @@ function addActiveColor(e){
 //綁定監聽
 function updateTabContent(){
 
-
   if(tabStatus=== 'route'){
     locationBtn.innerHTML =` 
     <span class="material-icons me-3"> search </span>
@@ -296,6 +294,8 @@ function updateTabContent(){
   tabsRenderList.style.height = 'calc(100vh - 400px)';
   renderCityOptionList();
   searchCityList.addEventListener('change',getCityName);
+
+  
   removeRouteLayers();
   removeMarkers();
   if(filterData.length!==0){
@@ -309,6 +309,7 @@ function updateTabContent(){
   // showRouteList(bikeShapeData);
 
   contentList.removeEventListener('click', showStationOnMap);
+  searchCityList.removeEventListener('change', getStationData); 
 
   contentList.addEventListener('click', showRouteOnMap);
   searchCityList.addEventListener('change', getRouteData);
@@ -322,6 +323,7 @@ function updateTabContent(){
   tabsRenderList.style.height = 'calc(100vh - 400px)';
   renderCityOptionList();
   searchCityList.addEventListener('change',getCityName);
+
   removeRouteLayers();
   removeMarkers();
   if(filterData.length!==0){
@@ -777,9 +779,22 @@ function init(){
   map.setView([23.7072015,121.0082785], 8); //需要轉乘數字不能用字串格式
 
   //預設分頁為
-  tabStatus = 'route';
-  // 更新樣式+互動效果
-  updateTabContent();
+  locationBtn.innerHTML =` 
+    <span class="material-icons me-3"> search </span>
+      搜尋
+  `;
+  tabsRenderList.style.height = 'calc(100vh - 400px)';
+  renderCityOptionList();
+  searchCityList.addEventListener('change',getCityName);
+  
+  //抓資料用
+  getRouteData();
+  //測試用
+  // showRouteList(bikeShapeData);
+  contentList.addEventListener('click', showRouteOnMap);
+  searchCityList.addEventListener('change', getRouteData);
+
+  tabs.addEventListener('click', changeTabs);
   
 }
 init();

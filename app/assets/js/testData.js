@@ -1320,5 +1320,3 @@ let bikeShapeData =[
     "Geometry": "MULTILINESTRING ((121.567357783199 24.9855960967387,121.568259004683 24.9867679288557))"
 }
 ];
-
-export { bikeCityData ,bikeAvaData, bikeShapeData };
